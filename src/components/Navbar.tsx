@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { ShieldCheck, User, Key, Trash2, Library, BookOpen, CheckSquare, Search, Compass } from 'lucide-react';
+import { ShieldCheck, User, Key, Trash2, Library, BookOpen, CheckSquare, Search, Compass, Globe, Share2 } from 'lucide-react';
 import { ResearcherProfile } from '../types';
 
 interface NavbarProps {
@@ -14,6 +14,7 @@ interface NavbarProps {
   onOpenProfile: () => void;
   onOpenApiSettings: () => void;
   onOpenPrivacy: () => void;
+  onOpenOnlineAccess?: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -23,6 +24,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenProfile,
   onOpenApiSettings,
   onOpenPrivacy,
+  onOpenOnlineAccess,
 }) => {
   return (
     <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200">
@@ -122,6 +124,17 @@ export const Navbar: React.FC<NavbarProps> = ({
 
           {/* Zone 3: Mode Status & Profile Quick Action */}
           <div className="flex items-center gap-2.5 shrink-0">
+            {/* Online Web App Button (Zero Installation Needed) */}
+            <button
+              onClick={onOpenOnlineAccess}
+              title="Online Web App · Share link without installation"
+              className="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-semibold rounded-full bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200 transition-colors cursor-pointer shadow-2xs"
+            >
+              <Globe className="w-3.5 h-3.5 text-blue-600" />
+              <span className="hidden sm:inline">Online Web App</span>
+              <span className="sm:hidden">Share</span>
+            </button>
+
             {/* Free vs Institutional API Mode Pill Button */}
             <button
               onClick={onOpenApiSettings}

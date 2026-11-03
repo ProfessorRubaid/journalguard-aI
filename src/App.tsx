@@ -21,6 +21,7 @@ import { ApiSettingsModal } from './components/ApiSettingsModal';
 import { PrivacyModal } from './components/PrivacyModal';
 import { Footer } from './components/Footer';
 import { DomainMismatchAlertBanner } from './components/DomainMismatchAlertBanner';
+import { OnlineAccessModal } from './components/OnlineAccessModal';
 
 import { 
   ResearcherProfile, 
@@ -59,6 +60,7 @@ export default function App() {
   const [isPrivacyModalOpen, setIsPrivacyModalOpen] = useState(false);
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   const [isCompareModalOpen, setIsCompareModalOpen] = useState(false);
+  const [isOnlineAccessOpen, setIsOnlineAccessOpen] = useState(false);
   const [compareList, setCompareList] = useState<SavedJournalEntry[]>([]);
 
   // Real-time Domain Mismatch UI Alert state
@@ -173,6 +175,7 @@ export default function App() {
         onOpenProfile={() => setIsProfileModalOpen(true)}
         onOpenApiSettings={() => setIsApiSettingsOpen(true)}
         onOpenPrivacy={() => setIsPrivacyModalOpen(true)}
+        onOpenOnlineAccess={() => setIsOnlineAccessOpen(true)}
       />
 
       {/* Main Content Area */}
@@ -198,6 +201,7 @@ export default function App() {
               onVerify={handleVerify}
               onNavigateTab={(tab) => setCurrentTab(tab as any)}
               isLoading={isVerifying}
+              onOpenOnlineAccess={() => setIsOnlineAccessOpen(true)}
             />
 
             {/* Results Panel */}
@@ -225,6 +229,7 @@ export default function App() {
             onNavigateTab={(tab) => setCurrentTab(tab as any)}
             onSelectJournalToVerify={(q) => handleVerify(q)}
             onOpenProfile={() => setIsProfileModalOpen(true)}
+            onOpenOnlineAccess={() => setIsOnlineAccessOpen(true)}
           />
         )}
 
@@ -294,6 +299,12 @@ export default function App() {
         isOpen={isPrivacyModalOpen}
         onClose={() => setIsPrivacyModalOpen(false)}
         onConfirmDelete={handleDeleteMyData}
+      />
+
+      {/* Online Web App / Zero-Install Share Modal */}
+      <OnlineAccessModal
+        isOpen={isOnlineAccessOpen}
+        onClose={() => setIsOnlineAccessOpen(false)}
       />
 
     </div>

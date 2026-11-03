@@ -28,12 +28,14 @@ interface HeroSectionProps {
   onVerify: (query: string | VerificationInputOptions) => void;
   onNavigateTab: (tab: string) => void;
   isLoading: boolean;
+  onOpenOnlineAccess?: () => void;
 }
 
 export const HeroSection: React.FC<HeroSectionProps> = ({
   onVerify,
   onNavigateTab,
   isLoading,
+  onOpenOnlineAccess,
 }) => {
   const [searchInput, setSearchInput] = useState('');
   const [isAdvancedMode, setIsAdvancedMode] = useState(false);
@@ -86,10 +88,22 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 text-center">
         
-        {/* Academic Direction Banner */}
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-50/80 border border-blue-200/60 text-blue-800 text-xs font-semibold mb-6 shadow-xs">
-          <Sparkles className="w-3.5 h-3.5 text-blue-600" />
-          <span>Created by <strong className="font-bold text-blue-900">Dr. Rubaid Ashfaq</strong></span>
+        {/* Academic Direction & Online Web App Badges */}
+        <div className="flex flex-wrap items-center justify-center gap-2.5 mb-6">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-50/80 border border-blue-200/60 text-blue-800 text-xs font-semibold shadow-xs">
+            <Sparkles className="w-3.5 h-3.5 text-blue-600" />
+            <span>Created by <strong className="font-bold text-blue-900">Dr. Rubaid Ashfaq</strong></span>
+          </div>
+
+          <button
+            type="button"
+            onClick={onOpenOnlineAccess}
+            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-semibold hover:bg-emerald-100 transition-colors cursor-pointer shadow-xs"
+            title="100% Online Web Application · Use via URL link without installation"
+          >
+            <Globe className="w-3.5 h-3.5 text-emerald-600" />
+            <span>Free Online Web Tool · Zero Install Needed</span>
+          </button>
         </div>
 
         {/* Hero Title */}
@@ -344,6 +358,37 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
               <span className="text-xs font-semibold text-slate-800">Research Fit</span>
               <span className="text-[11px] text-slate-500">Profile keywords</span>
             </div>
+          </div>
+        </div>
+
+        {/* Web-First Zero-Install Showcase Card */}
+        <div className="mt-8 p-5 sm:p-6 rounded-3xl bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white text-left shadow-lg border border-slate-800 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+          <div className="space-y-1">
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              <span className="text-xs font-bold uppercase tracking-wider text-emerald-400">
+                100% Online Web Application
+              </span>
+            </div>
+            <h3 className="text-base sm:text-lg font-bold text-white">
+              Use Anywhere via Web Link — No Installation, No Plugins, No Sign-Up
+            </h3>
+            <p className="text-xs sm:text-sm text-slate-300 max-w-2xl leading-relaxed">
+              Share the direct URL link with your co-authors, academic colleagues, or students. Works immediately on mobile, tablet, and desktop browsers with full local privacy.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2.5 shrink-0 self-stretch sm:self-auto">
+            {onOpenOnlineAccess && (
+              <button
+                type="button"
+                onClick={onOpenOnlineAccess}
+                className="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold flex items-center justify-center gap-2 transition-colors cursor-pointer shadow-sm shadow-blue-500/25 w-full sm:w-auto"
+              >
+                <Globe className="w-4 h-4" />
+                <span>Get Shareable Web Link</span>
+              </button>
+            )}
           </div>
         </div>
 

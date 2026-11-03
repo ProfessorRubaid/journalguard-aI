@@ -2,9 +2,19 @@ import express, { Request, Response } from 'express';
 import { createServer as createViteServer } from 'vite';
 import http from 'http';
 import path from 'path';
+import fs from 'fs';
+import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 
 dotenv.config();
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+let distPath = path.resolve(process.cwd(), 'dist');
+if (!fs.existsSync(distPath)) {
+  distPath = path.resolve(__dirname, '..', 'dist');
+}
 
 const app = express();
 const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
@@ -210,9 +220,9 @@ app.get('/api/wos/verify', async (req: Request, res: Response) => {
 // Mount Vite in development or static in production
 async function startServer() {
   if (process.env.NODE_ENV === 'production') {
-    app.use(express.static(path.resolve(__dirname, 'dist')));
+    app.use(express.static(distPath));
     app.get('*', (_req: Request, res: Response) => {
-      res.sendFile(path.resolve(__dirname, 'dist', 'index.html'));
+      res.sendFile(path.resolve(distPath, 'index.html'));
     });
   } else {
     const vite = await createViteServer({

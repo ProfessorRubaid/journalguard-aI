@@ -8,7 +8,7 @@
  */
 
 import { ResearcherProfile, SavedJournalEntry, VerificationResult } from '../types';
-import { DEFAULT_RESEARCHER_PROFILE, DEMO_RESEARCHER_DEFAULT } from './demoData';
+import { DEFAULT_RESEARCHER_PROFILE, DEMO_RESEARCHER_DEFAULT, getDemoVerificationResult } from './demoData';
 
 const PROFILE_KEY = 'jg_researcher_profile_v1';
 const SAVED_JOURNALS_KEY = 'jg_saved_journals_v1';
@@ -226,16 +226,49 @@ export function removeSavedJournal(id: string): void {
   saveSavedJournals(updated);
 }
 
+function getInitialSeedHistory(): VerificationResult[] {
+  try {
+    const verified = getDemoVerificationResult('verified');
+    verified.id = 'hist-seed-1';
+    verified.timestamp = new Date(Date.now() - 3600 * 1000 * 4).toISOString(); // 4 hours ago
+
+    const cloned = getDemoVerificationResult('cloned');
+    cloned.id = 'hist-seed-2';
+    cloned.timestamp = new Date(Date.now() - 3600 * 1000 * 26).toISOString(); // 1 day ago
+
+    const suspicious = getDemoVerificationResult('suspicious');
+    suspicious.id = 'hist-seed-3';
+    suspicious.timestamp = new Date(Date.now() - 3600 * 1000 * 72).toISOString(); // 3 days ago
+
+    const nonIndexed = getDemoVerificationResult('non_indexed');
+    nonIndexed.id = 'hist-seed-4';
+    nonIndexed.timestamp = new Date(Date.now() - 3600 * 1000 * 140).toISOString(); // 5 days ago
+
+    return [verified, cloned, suspicious, nonIndexed];
+  } catch (err) {
+    return [];
+  }
+}
+
 export function getStoredHistory(): VerificationResult[] {
   try {
     const data = localStorage.getItem(HISTORY_KEY);
     if (data) {
-      return JSON.parse(data);
+      const parsed = JSON.parse(data);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        return parsed;
+      }
     }
   } catch (e) {
     console.error('Failed reading history from storage:', e);
   }
-  return [];
+  const seed = getInitialSeedHistory();
+  if (seed.length > 0) {
+    try {
+      localStorage.setItem(HISTORY_KEY, JSON.stringify(seed));
+    } catch (_) {}
+  }
+  return seed;
 }
 
 export function addHistoryResult(result: VerificationResult): void {
