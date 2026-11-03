@@ -99,6 +99,17 @@ export interface DomainComparisonResult {
   };
 }
 
+export interface DomainMismatchAlert {
+  id: string;
+  title: string;
+  message: string;
+  submittedHostname: string;
+  canonicalDomain: string;
+  severity: 'critical' | 'high' | 'medium' | 'low';
+  recommendation: string;
+  timestamp: string;
+}
+
 export interface CloneGuardAssessment {
   isPossibleClone: boolean;
   confidence: 'LOW' | 'MEDIUM' | 'HIGH' | 'NONE';

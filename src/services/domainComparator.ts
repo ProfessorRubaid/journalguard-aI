@@ -12,7 +12,7 @@
  * - OJS hijacking paths and misleading TLD variations
  */
 
-import { DomainComparisonResult } from '../types';
+import { DomainComparisonResult, DomainMismatchAlert, VerificationResult } from '../types';
 import { lookupHijackedRegistry } from './hijackedRegistry';
 
 // Multi-part Public Suffixes commonly found in academic institutions and international registries
@@ -144,6 +144,23 @@ export function normalizeDomain(rawInput: string): {
     tld,
     path,
   };
+}
+
+/**
+ * Extracts the base domain (e.g., "revistadecineforum.com", "springer.com", "cineforum.it")
+ * from any submitted URL or hostname.
+ */
+export function extractBaseDomain(rawUrl: string): string {
+  const norm = normalizeDomain(rawUrl);
+  return norm.rootDomain || norm.host || '';
+}
+
+/**
+ * Extracts the normalized hostname (lowercase without www.) from any URL or hostname.
+ */
+export function extractHostname(rawUrl: string): string {
+  const norm = normalizeDomain(rawUrl);
+  return norm.host || '';
 }
 
 /**
@@ -498,4 +515,217 @@ export function compareDomainWithAuthoritative(options: DomainComparisonOptions)
       authoritativeSourcesChecked: sourcesChecked,
     },
   };
+}
+
+/**
+ * Curated list of known-good scholarly domains and authentic publisher infrastructure.
+ */
+export const KNOWN_GOOD_DOMAINS: string[] = [
+  'cineforum.it',
+  'sciencedirect.com',
+  'elsevier.com',
+  'cell.com',
+  'thelancet.com',
+  'springer.com',
+  'nature.com',
+  'biomedcentral.com',
+  'springeropen.com',
+  'palgrave.com',
+  'springernature.com',
+  'wiley.com',
+  'onlinelibrary.wiley.com',
+  'wileyonlinelibrary.com',
+  'tandfonline.com',
+  'taylorandfrancis.com',
+  'routledge.com',
+  'oup.com',
+  'academic.oup.com',
+  'cambridge.org',
+  'ieee.org',
+  'ieeexplore.ieee.org',
+  'sagepub.com',
+  'journals.sagepub.com',
+  'mdpi.com',
+  'frontiersin.org',
+  'plos.org',
+  'plosone.org',
+  'degruyter.com',
+  'emerald.com',
+  'emeraldinsight.com',
+  'iop.org',
+  'iopscience.iop.org',
+  'bmj.com',
+  'pubs.acs.org',
+  'acs.org',
+  'francoangeli.it',
+  'landesmuseum.ktn.gv.at',
+  'e-afr.org',
+  'sylwan.ibles.org',
+  'jokulljournal.is',
+  'unibe.ch',
+  'doaj.org',
+  'crossref.org',
+  'openalex.org',
+];
+
+/**
+ * Compares the base domain from the submitted URL against the known-good domain list or a metadata source.
+ */
+export function compareDomainAgainstKnownGood(
+  submittedUrl: string,
+  knownGoodList: string[] = KNOWN_GOOD_DOMAINS
+): {
+  isKnownGood: boolean;
+  baseDomain: string;
+  hostname: string;
+  matchedCanonicalDomain?: string;
+} {
+  const baseDomain = extractBaseDomain(submittedUrl);
+  const hostname = extractHostname(submittedUrl);
+
+  const matched = knownGoodList.find(good => 
+    hostname === good || 
+    hostname.endsWith(`.${good}`) || 
+    baseDomain === good ||
+    good.endsWith(`.${baseDomain}`)
+  );
+
+  return {
+    isKnownGood: Boolean(matched),
+    baseDomain,
+    hostname,
+    matchedCanonicalDomain: matched,
+  };
+}
+
+/**
+ * Compares a submitted URL against a canonical domain recorded in verified metadata.
+ */
+export function compareDomains(
+  submittedUrl: string,
+  canonicalDomainOrUrl: string
+): {
+  isMatch: boolean;
+  submittedHost: string;
+  canonicalHost: string;
+  submittedBaseDomain: string;
+  canonicalBaseDomain: string;
+  details: string;
+  severity: 'none' | 'low' | 'medium' | 'high' | 'critical';
+} {
+  const sub = normalizeDomain(submittedUrl);
+  const can = normalizeDomain(canonicalDomainOrUrl);
+
+  if (!sub.host || !can.host) {
+    return {
+      isMatch: true,
+      submittedHost: sub.host,
+      canonicalHost: can.host,
+      submittedBaseDomain: sub.rootDomain,
+      canonicalBaseDomain: can.rootDomain,
+      details: 'Insufficient domain data for direct comparison.',
+      severity: 'none',
+    };
+  }
+
+  const isExact = sub.host === can.host;
+  const isSubdomain = sub.host.endsWith(`.${can.host}`) || can.host.endsWith(`.${sub.host}`) || sub.rootDomain === can.rootDomain;
+  const isMatch = isExact || isSubdomain;
+
+  return {
+    isMatch,
+    submittedHost: sub.host,
+    canonicalHost: can.host,
+    submittedBaseDomain: sub.rootDomain,
+    canonicalBaseDomain: can.rootDomain,
+    details: isMatch
+      ? `Hostname "${sub.host}" correlates with canonical domain "${can.host}".`
+      : `DOMAIN MISMATCH: Submitted hostname "${sub.host}" does not match canonical verified domain "${can.host}".`,
+    severity: isMatch ? 'none' : 'critical',
+  };
+}
+
+// Global alert listeners for real-time UI notification dispatch
+type DomainAlertCallback = (alert: DomainMismatchAlert) => void;
+const domainAlertListeners = new Set<DomainAlertCallback>();
+
+export function onDomainMismatchAlert(callback: DomainAlertCallback): () => void {
+  domainAlertListeners.add(callback);
+  return () => {
+    domainAlertListeners.delete(callback);
+  };
+}
+
+export function broadcastDomainMismatchAlert(alert: DomainMismatchAlert): void {
+  for (const listener of domainAlertListeners) {
+    try {
+      listener(alert);
+    } catch (e) {
+      console.error('Error invoking domain mismatch alert listener:', e);
+    }
+  }
+}
+
+/**
+ * Triggers a UI alert upon verification if the hostname of the provided journal URL
+ * does not match the canonical domain recorded in the verified metadata.
+ */
+export function triggerDomainMismatchAlert(
+  result: VerificationResult,
+  onAlertTriggered?: (alert: DomainMismatchAlert) => void
+): DomainMismatchAlert | null {
+  const submittedUrl = result.journal.website || result.searchQuery;
+  const subHost = extractHostname(submittedUrl);
+
+  // If there's no submitted hostname, no domain mismatch alert needed
+  if (!subHost || !subHost.includes('.')) {
+    return null;
+  }
+
+  const canonicalDomain = 
+    result.cloneGuard.domainDetails?.canonicalHost ||
+    result.cloneGuard.legitimateRecord?.officialWebsite ||
+    result.cloneGuard.domainComparison?.primaryExpectedHost ||
+    '';
+
+  const canHost = extractHostname(canonicalDomain);
+
+  // Check if cloneGuard already flagged a domain inconsistency or if hosts differ
+  const hasInconsistency = 
+    result.cloneGuard.hasDomainInconsistency ||
+    (result.cloneGuard.domainComparison && result.cloneGuard.domainComparison.hasMismatch) ||
+    (canHost && subHost !== canHost && !subHost.endsWith(`.${canHost}`) && !canHost.endsWith(`.${subHost}`));
+
+  if (!hasInconsistency) {
+    return null;
+  }
+
+  const mismatchDetails = result.cloneGuard.domainComparison?.mismatchExplanation ||
+    `The hostname of the provided journal URL ("${subHost}") does not match the canonical domain ("${canHost || 'official publisher record'}") recorded in verified scholarly metadata.`;
+
+  const recommendation = result.cloneGuard.domainComparison?.recommendation ||
+    `Do not submit manuscripts or pay fees on ${subHost}. Navigate to the authentic verified journal portal: ${canHost ? `https://${canHost}` : 'official registry'}`;
+
+  const alert: DomainMismatchAlert = {
+    id: `alert-domain-${Date.now()}`,
+    title: result.cloneGuard.domainComparison?.warningTitle || 'CRITICAL DOMAIN MISMATCH DETECTED',
+    message: mismatchDetails,
+    submittedHostname: subHost,
+    canonicalDomain: canHost || 'Authoritative Publisher Record',
+    severity: (result.cloneGuard.domainComparison?.severity && result.cloneGuard.domainComparison.severity !== 'none')
+      ? result.cloneGuard.domainComparison.severity
+      : 'critical',
+    recommendation,
+    timestamp: new Date().toISOString(),
+  };
+
+  // Invoke direct callback if provided
+  if (onAlertTriggered) {
+    onAlertTriggered(alert);
+  }
+
+  // Broadcast to global listeners
+  broadcastDomainMismatchAlert(alert);
+
+  return alert;
 }

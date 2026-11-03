@@ -20,12 +20,14 @@ import { ReportModal } from './components/ReportModal';
 import { ApiSettingsModal } from './components/ApiSettingsModal';
 import { PrivacyModal } from './components/PrivacyModal';
 import { Footer } from './components/Footer';
+import { DomainMismatchAlertBanner } from './components/DomainMismatchAlertBanner';
 
 import { 
   ResearcherProfile, 
   VerificationResult, 
   SavedJournalEntry,
-  VerificationInputOptions 
+  VerificationInputOptions,
+  DomainMismatchAlert
 } from './types';
 import { 
   getStoredProfile, 
@@ -40,6 +42,7 @@ import {
   clearAllUserData
 } from './services/storage';
 import { verifyJournal } from './services/verificationEngine';
+import { triggerDomainMismatchAlert, onDomainMismatchAlert } from './services/domainComparator';
 import { DEMO_RESEARCHER_DEFAULT } from './services/demoData';
 
 export default function App() {
@@ -58,16 +61,33 @@ export default function App() {
   const [isCompareModalOpen, setIsCompareModalOpen] = useState(false);
   const [compareList, setCompareList] = useState<SavedJournalEntry[]>([]);
 
+  // Real-time Domain Mismatch UI Alert state
+  const [activeDomainAlert, setActiveDomainAlert] = useState<DomainMismatchAlert | null>(null);
+
+  // Subscribe to real-time domain alert notifications
+  useEffect(() => {
+    const unsubscribe = onDomainMismatchAlert((alert) => {
+      setActiveDomainAlert(alert);
+    });
+    return unsubscribe;
+  }, []);
+
   // Verification Search Handler
   const handleVerify = async (query: string | VerificationInputOptions) => {
     setIsVerifying(true);
     setCurrentTab('home');
+    setActiveDomainAlert(null); // Clear previous alert on new verification
 
     try {
       const res = await verifyJournal(query, profile);
       setCurrentResult(res);
       addHistoryResult(res);
       setHistory(getStoredHistory());
+
+      // Upon verification, check and trigger UI alert if hostname of provided journal URL does not match canonical domain
+      triggerDomainMismatchAlert(res, (alertData) => {
+        setActiveDomainAlert(alertData);
+      });
     } catch (err) {
       console.error('Verification error:', err);
     } finally {
@@ -157,6 +177,21 @@ export default function App() {
 
       {/* Main Content Area */}
       <main className="flex-1">
+        {/* Real-Time Domain Mismatch UI Alert Banner */}
+        {activeDomainAlert && (
+          <DomainMismatchAlertBanner
+            alert={activeDomainAlert}
+            onDismiss={() => setActiveDomainAlert(null)}
+            onScrollToDetails={() => {
+              setCurrentTab('home');
+              setTimeout(() => {
+                const el = document.getElementById('verification-result');
+                if (el) el.scrollIntoView({ behavior: 'smooth' });
+              }, 50);
+            }}
+          />
+        )}
+
         {currentTab === 'home' && (
           <div className="space-y-4">
             <HeroSection

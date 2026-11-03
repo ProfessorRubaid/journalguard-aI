@@ -24,14 +24,33 @@ import { queryOpenAlex } from './datasources/openalex';
 import { queryDOAJ } from './datasources/doaj';
 import { queryScopus } from './datasources/scopus';
 import { queryWebOfScience } from './datasources/wos';
-import { evaluateCloneGuard, compareDomainWithAuthoritative, normalizeDomain } from './cloneEngine';
+import { 
+  evaluateCloneGuard, 
+  compareDomainWithAuthoritative, 
+  normalizeDomain,
+  extractBaseDomain,
+  extractHostname,
+  compareDomains,
+  compareDomainAgainstKnownGood,
+  triggerDomainMismatchAlert,
+  KNOWN_GOOD_DOMAINS
+} from './cloneEngine';
 import { evaluatePredatoryRisk } from './riskEngine';
 import { calculateAuthenticityScore } from './authenticityEngine';
 import { calculateResearchFit } from './researchFitEngine';
 import { getDemoVerificationResult } from './demoData';
 import { lookupHijackedRegistry } from './hijackedRegistry';
 
-export { compareDomainWithAuthoritative, normalizeDomain };
+export { 
+  compareDomainWithAuthoritative, 
+  normalizeDomain,
+  extractBaseDomain,
+  extractHostname,
+  compareDomains,
+  compareDomainAgainstKnownGood,
+  triggerDomainMismatchAlert,
+  KNOWN_GOOD_DOMAINS
+};
 
 export async function verifyJournal(
   input: string | VerificationInputOptions,

@@ -9,9 +9,27 @@
  */
 
 import { CloneGuardAssessment, CloneMismatchItem, DomainComparisonResult } from '../types';
-import { compareDomainWithAuthoritative, normalizeDomain } from './domainComparator';
+import { 
+  compareDomainWithAuthoritative, 
+  normalizeDomain, 
+  extractBaseDomain, 
+  extractHostname, 
+  compareDomains, 
+  compareDomainAgainstKnownGood,
+  triggerDomainMismatchAlert,
+  KNOWN_GOOD_DOMAINS
+} from './domainComparator';
 
-export { compareDomainWithAuthoritative, normalizeDomain };
+export { 
+  compareDomainWithAuthoritative, 
+  normalizeDomain, 
+  extractBaseDomain, 
+  extractHostname, 
+  compareDomains, 
+  compareDomainAgainstKnownGood,
+  triggerDomainMismatchAlert,
+  KNOWN_GOOD_DOMAINS
+};
 
 export interface CloneGuardParams {
   submittedTitle: string;
