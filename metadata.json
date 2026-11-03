@@ -1,0 +1,6 @@
+{
+  "name": "JOURNALGUARD AI",
+  "description": "Journal Authenticity, Indexing & Research Integrity Intelligence. Verify before you submit. Created by Dr. Rubaid Ashfaq.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
