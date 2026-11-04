@@ -26,3 +26,21 @@
     page-break-before: always;
   }
 }
+
+@keyframes rollVertical {
+  0% {
+    transform: translateY(0%);
+  }
+  100% {
+    transform: translateY(-50%);
+  }
+}
+
+.animate-roll-vertical {
+  animation: rollVertical 45s linear infinite;
+}
+
+.animate-roll-vertical:hover {
+  animation-play-state: paused;
+}
+

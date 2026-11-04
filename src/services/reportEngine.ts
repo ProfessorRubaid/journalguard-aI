@@ -7,7 +7,7 @@ import { VerificationResult, ResearcherProfile } from '../types';
 
 export function exportResultToCSV(result: VerificationResult, profile: ResearcherProfile): void {
   const rows = [
-    ['JOURNALGUARD AI - JOURNAL VERIFICATION REPORT'],
+    ['SHODHSETU - JOURNAL VERIFICATION REPORT'],
     ['Created by', 'Dr. Rubaid Ashfaq'],
     ['Report Date', result.timestamp],
     [''],
@@ -29,7 +29,7 @@ export function exportResultToCSV(result: VerificationResult, profile: Researche
     [''],
     ['INTELLIGENCE SCORES'],
     ['Authenticity Score (0-100)', result.authenticityScore.total.toString()],
-    ['JournalGuard Analytical Risk Score', `${result.riskAnalysis.riskScore} (${result.riskAnalysis.riskTier})`],
+    ['ShodhSetu Analytical Risk Score', `${result.riskAnalysis.riskScore} (${result.riskAnalysis.riskTier})`],
     ['Research Fit Score', `${result.researchFit.total}% (${result.researchFit.tier})`],
     ['Cloning / Hijacking Risk', result.cloneGuard.isPossibleClone ? 'YES - ELEVATED/CRITICAL' : 'NO - RECORD CONSISTENT'],
     [''],
@@ -50,7 +50,7 @@ export function exportResultToCSV(result: VerificationResult, profile: Researche
   const encodedUri = encodeURI(csvContent);
   const link = document.createElement('a');
   link.setAttribute('href', encodedUri);
-  link.setAttribute('download', `JournalGuard_Report_${result.journal.issn || 'Record'}.csv`);
+  link.setAttribute('download', `ShodhSetu_Report_${result.journal.issn || 'Record'}.csv`);
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
@@ -59,10 +59,10 @@ export function exportResultToCSV(result: VerificationResult, profile: Researche
 export function exportResultToJSON(result: VerificationResult, profile: ResearcherProfile): void {
   const exportPayload = {
     metadata: {
-      generator: 'JOURNALGUARD AI',
+      generator: 'ShodhSetu',
       createdBy: 'Dr. Rubaid Ashfaq',
       exportedAt: new Date().toISOString(),
-      disclaimer: 'JOURNALGUARD AI is an academic screening tool. Indicators do not represent official determinations by indexing bodies.',
+      disclaimer: 'ShodhSetu is an academic screening tool. Indicators do not represent official determinations by indexing bodies.',
     },
     researcher: profile,
     verification: result,
@@ -71,7 +71,7 @@ export function exportResultToJSON(result: VerificationResult, profile: Research
   const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(exportPayload, null, 2));
   const link = document.createElement('a');
   link.setAttribute('href', dataStr);
-  link.setAttribute('download', `JournalGuard_Report_${result.journal.issn || 'Record'}.json`);
+  link.setAttribute('download', `ShodhSetu_Report_${result.journal.issn || 'Record'}.json`);
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);

@@ -27,9 +27,11 @@ import {
   ChevronDown,
   ChevronUp,
   AlertOctagon,
-  Network
+  Network,
+  Mail
 } from 'lucide-react';
 import { VerificationResult, ResearcherProfile } from '../types';
+import { EditorAlertModal } from './EditorAlertModal';
 
 interface VerificationResultViewProps {
   result: VerificationResult;
@@ -52,8 +54,17 @@ export const VerificationResultView: React.FC<VerificationResultViewProps> = ({
 }) => {
   const [showAllIndicators, setShowAllIndicators] = useState(false);
   const [isSavedLocal, setIsSavedLocal] = useState(isSaved);
+  const [isEditorAlertOpen, setIsEditorAlertOpen] = useState(false);
 
   const { journal, authenticityScore, riskAnalysis, cloneGuard, researchFit, sources } = result;
+
+  // Flag if journal is confirmed or highly suspected predatory / cloned
+  const isPredatoryOrClone = 
+    cloneGuard.hasDomainInconsistency || 
+    cloneGuard.hasIssnMismatch || 
+    cloneGuard.isPossibleClone || 
+    riskAnalysis.riskTier === 'CRITICAL' || 
+    riskAnalysis.riskTier === 'HIGH';
 
   // Trigger celebration confetti for verified low-risk journals
   useEffect(() => {
@@ -169,9 +180,9 @@ export const VerificationResultView: React.FC<VerificationResultViewProps> = ({
                 <>
                   <span className="text-slate-300">·</span>
                   <a
-                    href={journal.website}
+                    href={journal.website.startsWith('http') ? journal.website : `https://${journal.website}`}
                     target="_blank"
-                    rel="noreferrer"
+                    rel="noopener noreferrer"
                     className="flex items-center gap-1 text-blue-600 hover:text-blue-800 hover:underline font-medium"
                   >
                     <Globe className="w-3.5 h-3.5" />
@@ -204,6 +215,17 @@ export const VerificationResultView: React.FC<VerificationResultViewProps> = ({
               <FileText className="w-4 h-4" />
               <span>Audit Report</span>
             </button>
+
+            {isPredatoryOrClone && (
+              <button
+                onClick={() => setIsEditorAlertOpen(true)}
+                className="px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-rose-600 hover:bg-rose-700 text-white flex items-center gap-1.5 transition-all shadow-xs cursor-pointer"
+                title="Send official forensic alert warning to the authentic journal editors"
+              >
+                <Mail className="w-4 h-4" />
+                <span>Mail Real Editors</span>
+              </button>
+            )}
 
             <button
               onClick={onRecheck}
@@ -273,7 +295,7 @@ export const VerificationResultView: React.FC<VerificationResultViewProps> = ({
             <div>
               <div className="flex items-center justify-between">
                 <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
-                  JournalGuard Risk Score
+                  ShodhSetu Risk Score
                 </span>
                 <span className={`w-2.5 h-2.5 rounded-full ${riskStyle.dot}`} />
               </div>
@@ -561,14 +583,41 @@ export const VerificationResultView: React.FC<VerificationResultViewProps> = ({
               </span>
             </div>
             <a
-              href={cloneGuard.legitimateRecord.officialWebsite}
+              href={cloneGuard.legitimateRecord.officialWebsite?.startsWith('http') ? cloneGuard.legitimateRecord.officialWebsite : `https://${cloneGuard.legitimateRecord.officialWebsite}`}
               target="_blank"
-              rel="noreferrer"
+              rel="noopener noreferrer"
               className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold inline-flex items-center gap-1.5 shrink-0 shadow-xs transition-colors"
             >
               <span>Visit Authentic Website</span>
               <ExternalLink className="w-3.5 h-3.5" />
             </a>
+          </div>
+        )}
+
+        {/* Real Editors Urgent Notification Banner for Cloned / Predatory Cases */}
+        {isPredatoryOrClone && (
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 rounded-2xl bg-gradient-to-r from-rose-50 via-amber-50 to-orange-50 border-2 border-rose-300 text-xs shadow-xs">
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <span className="px-2 py-0.5 rounded-full bg-rose-600 text-white text-[10px] font-black uppercase tracking-wider">
+                  ACTION RECOMMENDED
+                </span>
+                <span className="font-extrabold text-rose-950 text-sm">
+                  Alert Authentic Editorial Office &amp; Publisher
+                </span>
+              </div>
+              <p className="text-rose-800 leading-relaxed font-medium">
+                The authentic journal's title and ISSN are being exploited by counterfeit / predatory actors.
+                Dispatch a formal forensic alert with verified metadata evidence to assist in legal DMCA takedowns and indexing alerts.
+              </p>
+            </div>
+            <button
+              onClick={() => setIsEditorAlertOpen(true)}
+              className="px-4 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 active:scale-95 text-white font-bold inline-flex items-center gap-2 shrink-0 shadow-xs transition-all cursor-pointer"
+            >
+              <Mail className="w-4 h-4" />
+              <span>Mail Real Editors</span>
+            </button>
           </div>
         )}
 
@@ -838,7 +887,7 @@ export const VerificationResultView: React.FC<VerificationResultViewProps> = ({
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
           <div>
             <h3 className="text-base font-bold text-slate-900">
-              Predatory Risk Analysis (JournalGuard Analytical Engine)
+              Predatory Risk Analysis (ShodhSetu Analytical Engine)
             </h3>
             <p className="text-xs text-slate-500">
               Evidence-based screening of 14 predatory and deceptive publishing indicators.
@@ -939,6 +988,14 @@ export const VerificationResultView: React.FC<VerificationResultViewProps> = ({
           </button>
         </div>
       </div>
+
+      {/* Editor Forensic Alert Modal */}
+      <EditorAlertModal
+        isOpen={isEditorAlertOpen}
+        onClose={() => setIsEditorAlertOpen(false)}
+        result={result}
+        profile={profile}
+      />
 
     </div>
   );

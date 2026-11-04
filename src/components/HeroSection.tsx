@@ -99,10 +99,10 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
             type="button"
             onClick={onOpenOnlineAccess}
             className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-semibold hover:bg-emerald-100 transition-colors cursor-pointer shadow-xs"
-            title="100% Online Web Application · Use via URL link without installation"
+            title="100% Online Web Application · Use via URL link without installation or Gmail login"
           >
             <Globe className="w-3.5 h-3.5 text-emerald-600" />
-            <span>Free Online Web Tool · Zero Install Needed</span>
+            <span>Free Online Web Tool · No Gmail Login or App Install Needed</span>
           </button>
         </div>
 
@@ -364,17 +364,20 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
         {/* Web-First Zero-Install Showcase Card */}
         <div className="mt-8 p-5 sm:p-6 rounded-3xl bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white text-left shadow-lg border border-slate-800 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div className="space-y-1">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
               <span className="text-xs font-bold uppercase tracking-wider text-emerald-400">
                 100% Online Web Application
               </span>
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-950/80 text-emerald-300 border border-emerald-800">
+                No Gmail Account or Login Needed
+              </span>
             </div>
             <h3 className="text-base sm:text-lg font-bold text-white">
-              Use Anywhere via Web Link — No Installation, No Plugins, No Sign-Up
+              Use Anywhere via Web Link — No Gmail Login, No App Downloads, No Passwords
             </h3>
             <p className="text-xs sm:text-sm text-slate-300 max-w-2xl leading-relaxed">
-              Share the direct URL link with your co-authors, academic colleagues, or students. Works immediately on mobile, tablet, and desktop browsers with full local privacy.
+              Share the direct URL link with your co-authors, academic colleagues, or students. Open access for researchers worldwide without signing in with Google or creating accounts.
             </p>
           </div>
 

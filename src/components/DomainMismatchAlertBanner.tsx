@@ -7,29 +7,32 @@
  */
 
 import React from 'react';
-import { AlertOctagon, ExternalLink, X, ShieldAlert, ArrowRight } from 'lucide-react';
+import { AlertOctagon, ExternalLink, X, ShieldAlert, ArrowRight, Mail } from 'lucide-react';
 import { DomainMismatchAlert } from '../types';
 
 interface DomainMismatchAlertBannerProps {
   alert: DomainMismatchAlert;
   onDismiss: () => void;
   onScrollToDetails?: () => void;
+  onOpenEditorAlert?: () => void;
 }
 
 export const DomainMismatchAlertBanner: React.FC<DomainMismatchAlertBannerProps> = ({
   alert,
   onDismiss,
   onScrollToDetails,
+  onOpenEditorAlert,
 }) => {
-  const canonicalUrl = alert.canonicalDomain.startsWith('http') 
-    ? alert.canonicalDomain 
-    : `https://${alert.canonicalDomain}`;
+  const cleanDomain = alert.canonicalDomain ? alert.canonicalDomain.trim() : '';
+  const canonicalUrl = cleanDomain.startsWith('http://') || cleanDomain.startsWith('https://') 
+    ? cleanDomain 
+    : `https://${cleanDomain}`;
 
   return (
     <div 
       role="alert" 
       aria-live="assertive"
-      className="max-w-6xl mx-auto px-4 sm:px-6 pt-4 pb-2 transition-all animate-in fade-in slide-in-from-top-4 duration-300"
+      className="max-w-6xl mx-auto px-4 sm:px-6 pt-2 pb-6 transition-all animate-in fade-in slide-in-from-bottom-4 duration-300"
     >
       <div className="rounded-3xl p-5 sm:p-6 bg-gradient-to-r from-rose-50 via-red-50 to-amber-50 border-2 border-rose-400 shadow-md relative overflow-hidden">
         
@@ -83,7 +86,19 @@ export const DomainMismatchAlertBanner: React.FC<DomainMismatchAlertBannerProps>
           </div>
 
           {/* Action Buttons */}
-          <div className="flex items-center gap-2 w-full md:w-auto shrink-0 pt-2 md:pt-0">
+          <div className="flex flex-wrap items-center gap-2 w-full md:w-auto shrink-0 pt-2 md:pt-0">
+            {onOpenEditorAlert && (
+              <button
+                type="button"
+                onClick={onOpenEditorAlert}
+                className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-2xl bg-rose-600 hover:bg-rose-700 active:scale-95 text-white text-xs font-bold shadow-xs transition-all cursor-pointer"
+                title="Send pre-filled forensic alert warning to legitimate journal editors"
+              >
+                <Mail className="w-3.5 h-3.5" />
+                <span>Mail Real Editors</span>
+              </button>
+            )}
+
             {alert.canonicalDomain && alert.canonicalDomain !== 'Authoritative Publisher Record' && (
               <a
                 href={canonicalUrl}

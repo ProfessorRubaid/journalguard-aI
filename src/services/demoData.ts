@@ -626,7 +626,7 @@ export function getDemoVerificationResult(type: 'verified' | 'suspicious' | 'clo
           'Consult with your institutional research librarian for accredited target journals.',
         ],
       },
-      limitations: 'Warning score compiled via JournalGuard Analytical Risk Engine heuristics.',
+      limitations: 'Warning score compiled via ShodhSetu Analytical Risk Engine heuristics.',
     };
   }
 

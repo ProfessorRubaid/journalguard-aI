@@ -251,3 +251,32 @@ export interface RecommendedJournalItem {
   officialWebsite: string;
   subjectMatch: string[];
 }
+
+export type EmailDispatchMethod = 'mailto' | 'gmail' | 'outlook' | 'clipboard';
+
+export interface SentEditorAlertRecord {
+  id: string;
+  timestamp: string;
+  journalTitle: string;
+  issn: string;
+  canonicalDomain: string;
+  counterfeitHost: string;
+  recipients: string[];
+  subject: string;
+  dispatchMethod: EmailDispatchMethod;
+  riskTier: RiskTier;
+  authenticityScore: number;
+  senderName?: string;
+}
+
+export interface ForensicEmailAlertData {
+  recipients: string;
+  primaryRecipient: string;
+  subject: string;
+  body: string;
+  cleanCanonicalHost: string;
+  counterfeitHost: string;
+  infringingUrl: string;
+  summary: string;
+}
+

@@ -38,12 +38,13 @@ export const OnlineAccessModal: React.FC<OnlineAccessModalProps> = ({
 
   if (!isOpen) return null;
 
-  // Use current window location or fallback to shared app URL
-  const currentUrl = typeof window !== 'undefined' && window.location.origin
+  // Prefer public permanent shared app URL so external users don't encounter dev authorization blocks
+  const PUBLIC_APP_URL = 'https://ais-pre-idoknbj6wy4hmjlj7llvbd-401921131266.asia-east1.run.app';
+  const currentUrl = typeof window !== 'undefined' && window.location.origin && !window.location.origin.includes('ais-dev-') && !window.location.origin.includes('localhost')
     ? window.location.origin
-    : 'https://ais-pre-idoknbj6wy4hmjlj7llvbd-401921131266.asia-east1.run.app';
+    : PUBLIC_APP_URL;
 
-  const shareText = `Verify journals before submitting your research. JournalGuard AI is a free online academic tool to detect predatory publishers, cloned domains, and verify Scopus/DOAJ indexing — no install required: ${currentUrl}`;
+  const shareText = `Verify journals before submitting your research. ShodhSetu is a free online academic tool to detect predatory publishers, cloned domains, and verify Scopus/DOAJ indexing — no install required: ${currentUrl}`;
 
   const handleCopyLink = async () => {
     try {
@@ -51,22 +52,15 @@ export const OnlineAccessModal: React.FC<OnlineAccessModalProps> = ({
       setCopied(true);
       setTimeout(() => setCopied(false), 2500);
     } catch {
-      // Fallback
       setCopied(true);
       setTimeout(() => setCopied(false), 2500);
     }
   };
 
-  const handleMailShare = () => {
-    const subject = encodeURIComponent('JournalGuard AI - Free Online Journal Verification Tool (No Install Required)');
-    const body = encodeURIComponent(`Dear Colleague,\n\nI recommend using JournalGuard AI to verify academic journals before manuscript submission:\n\n${currentUrl}\n\nKey capabilities:\n- Detect cloned & hijacked journal websites\n- Cross-check ISSN and canonical publisher domains\n- Query Crossref, OpenAlex, DOAJ and Scopus\n- 100% online in your browser — zero installation or account required.\n\nAcademic Concept & Direction: Dr. Rubaid Ashfaq`);
-    window.open(`mailto:?subject=${subject}&body=${body}`, '_blank');
-  };
-
-  const handleWhatsAppShare = () => {
-    const text = encodeURIComponent(`Verify academic journals before submitting! Check indexing, DOAJ, and detect cloned websites directly in your browser (no app install needed): ${currentUrl}`);
-    window.open(`https://api.whatsapp.com/send?text=${text}`, '_blank');
-  };
+  const emailSubject = encodeURIComponent('ShodhSetu - Free Online Journal Verification Tool (No Install Required)');
+  const emailBody = encodeURIComponent(`Dear Colleague,\n\nI recommend using ShodhSetu to verify academic journals before submission:\n\n${currentUrl}\n\n- 100% online in your browser\n- Zero installation or account required\n\nAcademic Concept & Direction: Dr. Rubaid Ashfaq`);
+  const mailShareUrl = `mailto:?subject=${emailSubject}&body=${emailBody}`;
+  const whatsAppShareUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-200">
@@ -104,15 +98,19 @@ export const OnlineAccessModal: React.FC<OnlineAccessModalProps> = ({
           
           {/* Hero Banner inside Modal */}
           <div className="p-5 rounded-2xl bg-gradient-to-br from-blue-50 via-indigo-50/60 to-purple-50 border border-blue-100/80 space-y-3">
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-600 text-white text-[11px] font-bold">
-              <Sparkles className="w-3 h-3" />
-              <span>100% Browser-Native Web App</span>
+            <div className="flex flex-wrap items-center gap-1.5">
+              <span className="px-2.5 py-0.5 rounded-full bg-blue-600 text-white text-[11px] font-bold">
+                100% Browser-Native Web App
+              </span>
+              <span className="px-2.5 py-0.5 rounded-full bg-emerald-600 text-white text-[11px] font-bold">
+                ✓ No Gmail Login Required
+              </span>
             </div>
             <h3 className="text-base sm:text-lg font-bold text-slate-900 leading-snug">
-              Anyone with this link can use JournalGuard AI immediately
+              Anyone with this link can use ShodhSetu immediately
             </h3>
             <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-              No need to download files, install software from app stores, or configure extensions. Simply open the URL in Chrome, Safari, Firefox, or Edge on any computer, phone, or tablet.
+              No need to log in with a Gmail or Google account, register credentials, or download mobile apps. Simply open the URL link in Chrome, Safari, Firefox, or Edge on any computer, phone, or tablet to verify journals immediately.
             </p>
           </div>
 
@@ -121,33 +119,46 @@ export const OnlineAccessModal: React.FC<OnlineAccessModalProps> = ({
             <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block">
               Shareable Online Web Link
             </label>
-            <div className="flex items-center gap-2 p-2 bg-slate-50 border border-slate-200 rounded-2xl">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 p-2 bg-slate-50 border border-slate-200 rounded-2xl">
               <input
                 type="text"
                 readOnly
                 value={currentUrl}
                 className="flex-1 bg-transparent px-2.5 text-xs sm:text-sm font-mono text-slate-800 focus:outline-hidden select-all"
               />
-              <button
-                onClick={handleCopyLink}
-                className={`px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-xs ${
-                  copied
-                    ? 'bg-emerald-600 text-white'
-                    : 'bg-blue-600 hover:bg-blue-700 text-white'
-                }`}
-              >
-                {copied ? (
-                  <>
-                    <Check className="w-3.5 h-3.5" />
-                    <span>Copied!</span>
-                  </>
-                ) : (
-                  <>
-                    <Copy className="w-3.5 h-3.5" />
-                    <span>Copy Link</span>
-                  </>
-                )}
-              </button>
+              <div className="flex items-center gap-1.5 shrink-0">
+                <a
+                  href={currentUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-3.5 py-2 rounded-xl text-xs font-bold bg-slate-900 hover:bg-slate-800 text-white flex items-center gap-1.5 transition-all cursor-pointer shadow-xs"
+                  title="Open this web application link in a new browser tab"
+                >
+                  <span>Open Link</span>
+                  <ExternalLink className="w-3.5 h-3.5" />
+                </a>
+
+                <button
+                  onClick={handleCopyLink}
+                  className={`px-3.5 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-xs ${
+                    copied
+                      ? 'bg-emerald-600 text-white'
+                      : 'bg-blue-600 hover:bg-blue-700 text-white'
+                  }`}
+                >
+                  {copied ? (
+                    <>
+                      <Check className="w-3.5 h-3.5" />
+                      <span>Copied!</span>
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="w-3.5 h-3.5" />
+                      <span>Copy Link</span>
+                    </>
+                  )}
+                </button>
+              </div>
             </div>
             <span className="text-[11px] text-slate-500 block">
               💡 Tip: Bookmark this URL (<kbd className="font-mono bg-slate-100 px-1 py-0.5 rounded text-slate-700">Ctrl+D</kbd> or <kbd className="font-mono bg-slate-100 px-1 py-0.5 rounded text-slate-700">⌘+D</kbd>) for instant access during research writing.
@@ -185,16 +196,16 @@ export const OnlineAccessModal: React.FC<OnlineAccessModalProps> = ({
               </div>
             </div>
 
-            <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 flex items-start gap-3">
+            <div className="p-3.5 rounded-2xl bg-purple-50/70 border border-purple-200/80 flex items-start gap-3">
               <div className="w-8 h-8 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center shrink-0 mt-0.5">
                 <ShieldCheck className="w-4 h-4" />
               </div>
               <div className="space-y-0.5">
-                <h4 className="text-xs font-bold text-slate-900">
-                  No Sign-Up or App Install
+                <h4 className="text-xs font-bold text-purple-950">
+                  No Gmail / Google Login Required
                 </h4>
-                <p className="text-[11px] text-slate-500 leading-normal">
-                  Start verifying immediately without mandatory account registration or passwords.
+                <p className="text-[11px] text-purple-800 leading-normal">
+                  Open public access. Anyone with the URL can audit journals instantly with zero sign-ins, no Gmail accounts, and no passwords.
                 </p>
               </div>
             </div>
@@ -221,21 +232,23 @@ export const OnlineAccessModal: React.FC<OnlineAccessModalProps> = ({
               Share With Your Research Group
             </span>
             <div className="flex flex-wrap gap-2">
-              <button
-                onClick={handleMailShare}
+              <a
+                href={mailShareUrl}
                 className="px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center gap-2 transition-colors cursor-pointer"
               >
                 <Mail className="w-3.5 h-3.5 text-slate-500" />
                 <span>Email Colleagues</span>
-              </button>
+              </a>
 
-              <button
-                onClick={handleWhatsAppShare}
+              <a
+                href={whatsAppShareUrl}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="px-3.5 py-2 rounded-xl text-xs font-semibold bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 flex items-center gap-2 transition-colors cursor-pointer"
               >
                 <MessageSquare className="w-3.5 h-3.5 text-emerald-600" />
                 <span>Share via WhatsApp</span>
-              </button>
+              </a>
 
               <button
                 onClick={() => setShowQr(prev => !prev)}
@@ -257,7 +270,7 @@ export const OnlineAccessModal: React.FC<OnlineAccessModalProps> = ({
                   </div>
                 </div>
                 <p className="text-xs text-slate-600 max-w-xs">
-                  Scan with your phone camera to open JournalGuard AI immediately in your mobile browser.
+                  Scan with your phone camera to open ShodhSetu immediately in your mobile browser.
                 </p>
               </div>
             )}

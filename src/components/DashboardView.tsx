@@ -545,14 +545,17 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           <div className="space-y-0.5">
             <div className="flex items-center gap-2 flex-wrap">
               <h3 className="text-sm sm:text-base font-extrabold text-slate-900">
-                100% Online Web Application · Zero Installation Required
+                100% Online Web Application · Zero Installation &amp; No Gmail Login Required
               </h3>
               <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
                 Direct Browser Access
               </span>
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-purple-100 text-purple-800 border border-purple-200">
+                No Login Required
+              </span>
             </div>
             <p className="text-xs text-slate-600 max-w-2xl leading-relaxed">
-              Anyone with your shareable URL link can use JournalGuard AI directly in their browser without downloading software, installing mobile apps, or creating accounts.
+              Anyone with your shareable URL link can use ShodhSetu directly in their browser without signing in with a Gmail or Google account, installing software, or creating passwords.
             </p>
           </div>
         </div>

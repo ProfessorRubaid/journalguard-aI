@@ -1,6 +1,6 @@
 /**
- * JOURNALGUARD AI
- * Journal Authenticity, Indexing & Research Integrity Intelligence
+ * ShodhSetu
+ * Academic Research Bridge, Journal Authenticity & Research Integrity Intelligence
  * Concept & Academic Direction: Dr. Rubaid Ashfaq
  * Tagline: Verify Before You Submit. Publish With Confidence.
  */
@@ -22,6 +22,7 @@ import { PrivacyModal } from './components/PrivacyModal';
 import { Footer } from './components/Footer';
 import { DomainMismatchAlertBanner } from './components/DomainMismatchAlertBanner';
 import { OnlineAccessModal } from './components/OnlineAccessModal';
+import { EditorAlertModal } from './components/EditorAlertModal';
 
 import { 
   ResearcherProfile, 
@@ -61,6 +62,7 @@ export default function App() {
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   const [isCompareModalOpen, setIsCompareModalOpen] = useState(false);
   const [isOnlineAccessOpen, setIsOnlineAccessOpen] = useState(false);
+  const [isEditorAlertOpen, setIsEditorAlertOpen] = useState(false);
   const [compareList, setCompareList] = useState<SavedJournalEntry[]>([]);
 
   // Real-time Domain Mismatch UI Alert state
@@ -180,21 +182,6 @@ export default function App() {
 
       {/* Main Content Area */}
       <main className="flex-1">
-        {/* Real-Time Domain Mismatch UI Alert Banner */}
-        {activeDomainAlert && (
-          <DomainMismatchAlertBanner
-            alert={activeDomainAlert}
-            onDismiss={() => setActiveDomainAlert(null)}
-            onScrollToDetails={() => {
-              setCurrentTab('home');
-              setTimeout(() => {
-                const el = document.getElementById('verification-result');
-                if (el) el.scrollIntoView({ behavior: 'smooth' });
-              }, 50);
-            }}
-          />
-        )}
-
         {currentTab === 'home' && (
           <div className="space-y-4">
             <HeroSection
@@ -257,6 +244,24 @@ export default function App() {
         {currentTab === 'academy' && (
           <AcademyView />
         )}
+
+        {/* Real-Time Domain Mismatch UI Alert Banner (Rendered at the bottom / last of content) */}
+        {activeDomainAlert && (
+          <div className="pt-2 pb-6">
+            <DomainMismatchAlertBanner
+              alert={activeDomainAlert}
+              onDismiss={() => setActiveDomainAlert(null)}
+              onOpenEditorAlert={() => setIsEditorAlertOpen(true)}
+              onScrollToDetails={() => {
+                setCurrentTab('home');
+                setTimeout(() => {
+                  const el = document.getElementById('verification-result');
+                  if (el) el.scrollIntoView({ behavior: 'smooth' });
+                }, 50);
+              }}
+            />
+          </div>
+        )}
       </main>
 
       {/* Academic Footer */}
@@ -305,6 +310,14 @@ export default function App() {
       <OnlineAccessModal
         isOpen={isOnlineAccessOpen}
         onClose={() => setIsOnlineAccessOpen(false)}
+      />
+
+      {/* Real Journal Editors Urgent Forensic Alert Modal */}
+      <EditorAlertModal
+        isOpen={isEditorAlertOpen}
+        onClose={() => setIsEditorAlertOpen(false)}
+        result={currentResult}
+        profile={profile}
       />
 
     </div>

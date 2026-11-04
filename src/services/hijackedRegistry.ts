@@ -149,6 +149,61 @@ export const KNOWN_HIJACKED_REGISTRY: HijackedRecord[] = [
     hijackingTactics: 'Altered English title variant spoofing legitimate print-only Swiss academy publication.',
     evidenceSource: 'ISSN International Register, Bern University Library',
   },
+  {
+    officialTitle: 'Vikalpa: The Journal for Decision Makers',
+    issn: '0256-0909',
+    eIssn: '2395-3799',
+    officialPublisher: 'SAGE Publications / Indian Institute of Management Ahmedabad (IIMA)',
+    officialWebsite: 'https://journals.sagepub.com/home/vik',
+    officialCountry: 'India',
+    authenticScope: 'Management, Economics, Strategic Decision Making',
+    hijackedDomains: [
+      'vikalpa-journal.org',
+      'vikalpajournal.com',
+      'vikalparesearch.com',
+    ],
+    hijackedTitleVariants: [
+      'Vikalpa International Journal',
+      'Vikalpa Multidisciplinary Research',
+    ],
+    hijackingTactics: 'Counterfeit portal hijacks IIM Ahmedabad\'s flagship journal. Promises rapid acceptance within 48 hours for a $250 publication fee.',
+    evidenceSource: 'IIMA Integrity Advisory, Retraction Watch',
+  },
+  {
+    officialTitle: 'Asian Journal of Chemistry',
+    issn: '0970-7077',
+    eIssn: '0975-427X',
+    officialPublisher: 'Chemical Publishing Co.',
+    officialWebsite: 'https://asianjournalofchemistry.co.in',
+    officialCountry: 'India',
+    authenticScope: 'Inorganic, Organic, Physical, Analytical Chemistry',
+    hijackedDomains: [
+      'asianjournalchemistry.com',
+      'asianchemistryjournal.org',
+    ],
+    hijackedTitleVariants: [
+      'Asian Journal of Chemistry & Engineering',
+    ],
+    hijackingTactics: 'Spoofs genuine chemistry serial by cloning layout, editorial board names, and claiming fraudulent Web of Science indexing.',
+    evidenceSource: 'Retraction Watch Hijacked Journal List',
+  },
+  {
+    officialTitle: 'Journal of Engineering and Applied Sciences',
+    issn: '1816-949X',
+    officialPublisher: 'Medwell Publications',
+    officialWebsite: 'https://medwelljournals.com/journalhome.php?jid=1816-949x',
+    officialCountry: 'Pakistan / UAE',
+    authenticScope: 'Engineering, Applied Physics, Computational Sciences',
+    hijackedDomains: [
+      'jeasonline.com',
+      'jeas-journal.org',
+    ],
+    hijackedTitleVariants: [
+      'JEAS Online International',
+    ],
+    hijackingTactics: 'Clone portal mimics Medwell title, misrepresenting discontinued indexing status as active Scopus Q1.',
+    evidenceSource: 'Cabells Predatory Reports, Retraction Watch',
+  },
 ];
 
 /**

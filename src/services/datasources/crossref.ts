@@ -24,7 +24,7 @@ export async function queryCrossref(query: string, issn?: string): Promise<{
     if (isDoi) {
       const doiString = cleanQuery.replace(/^https?:\/\/doi\.org\//i, '');
       const res = await fetch(`https://api.crossref.org/works/${encodeURIComponent(doiString)}`, {
-        headers: { 'User-Agent': 'JournalGuardAI/1.0 (mailto:academic-research@journalguard.org)' },
+        headers: { 'User-Agent': 'ShodhSetu/1.0 (mailto:academic-research@shodhsetu.org)' },
       });
       if (res.ok) {
         const json = await res.json();
@@ -57,7 +57,7 @@ export async function queryCrossref(query: string, issn?: string): Promise<{
     const targetIssn = issn || (cleanQuery.match(/^\d{4}-\d{3}[\dX]$/i) ? cleanQuery : undefined);
     if (targetIssn) {
       const res = await fetch(`https://api.crossref.org/journals/${encodeURIComponent(targetIssn)}`, {
-        headers: { 'User-Agent': 'JournalGuardAI/1.0 (mailto:academic-research@journalguard.org)' },
+        headers: { 'User-Agent': 'ShodhSetu/1.0 (mailto:academic-research@shodhsetu.org)' },
       });
       if (res.ok) {
         const json = await res.json();
@@ -88,7 +88,7 @@ export async function queryCrossref(query: string, issn?: string): Promise<{
 
     // Otherwise search works by container title
     const searchRes = await fetch(`https://api.crossref.org/works?query.container-title=${encodeURIComponent(cleanQuery)}&rows=3`, {
-      headers: { 'User-Agent': 'JournalGuardAI/1.0 (mailto:academic-research@journalguard.org)' },
+      headers: { 'User-Agent': 'ShodhSetu/1.0 (mailto:academic-research@shodhsetu.org)' },
     });
 
     if (searchRes.ok) {
