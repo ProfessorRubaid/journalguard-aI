@@ -1,20 +1,54 @@
-[README.md](https://github.com/user-attachments/files/34354337/README.md)
-# ShodhGuard AI
+[README(1).md](https://github.com/user-attachments/files/34354904/README.1.md)
+# SHODH SETU AI
 
-### Research Integrity Intelligence for Safer Journal Selection
+### Research Integrity Intelligence
 
-![ShodhGuard AI](assets/app-home.png)
-
-**ShodhGuard AI** is a research-integrity and journal-verification web
-application designed to help researchers, faculty members, research
-scholars, and students assess journals before submitting their
-manuscripts.
-
-The platform brings together journal identity verification, indexing
-checks, publisher information, cloning-risk detection, and
-predatory-risk indicators into a single research-friendly workflow.
+**Shodh Setu AI** is a modern research-support platform designed to help
+researchers, faculty members, PhD scholars, postgraduate students, and
+academic institutions verify journals before submitting research.
 
 > **Before You Submit. Verify Your Journal.**
+
+The platform brings journal verification, indexing checks, publisher
+information, domain intelligence, cloning-risk detection, and
+predatory-risk indicators into one streamlined workflow.
+
+------------------------------------------------------------------------
+
+## 🖥️ Application Preview
+
+![Shodh Setu AI Dashboard](assets/shodhsetu-ai-dashboard.png)
+
+### Journal Verification Dashboard
+
+The Shodh Setu AI interface provides a quick way to investigate a
+journal or journal website before manuscript submission.
+
+Key verification signals include:
+
+-   Journal identity
+-   Domain and website information
+-   ISSN cross-checking
+-   Indexing-related signals
+-   Publisher information
+-   Cloning / impersonation risks
+-   Predatory-risk indicators
+-   Emerging or regional journal signals
+
+------------------------------------------------------------------------
+
+## 🌉 What Does "Shodh Setu" Mean?
+
+**Shodh Setu (शोध सेतु)** combines two Indian concepts:
+
+-   **Shodh (शोध)** --- Research, investigation, scholarly inquiry
+-   **Setu (सेतु)** --- Bridge
+
+Together, **Shodh Setu** means a **bridge for research**.
+
+The name reflects the project's purpose: helping researchers build a
+safer bridge between **research discovery and trusted academic
+publishing**.
 
 ------------------------------------------------------------------------
 
@@ -22,112 +56,182 @@ predatory-risk indicators into a single research-friendly workflow.
 
 ### 🔎 Journal Verification
 
-Enter a journal URL, domain, ISSN, or journal information and perform a
-verification check before submission.
+Enter a journal URL, domain, ISSN, or related journal information to
+begin a structured verification process.
 
-### 🛡️ Journal Cloning Detection
+### 📚 Indexing & ISSN Checks
 
-Helps identify suspicious or cloned journal websites that may imitate
-legitimate publications.
+Helps researchers examine indexing claims and journal identity
+information before relying on a journal for publication.
 
-### 📚 Indexing & ISSN Cross-Check
+### 🛡️ Cloned Journal Detection
 
-Cross-check journal identity and indexing-related information to help
-researchers distinguish genuine journals from questionable listings.
+Highlights suspicious domain or identity patterns that may indicate a
+cloned, impersonated, or deceptive journal website.
 
 ### ⚠️ Predatory-Risk Indicators
 
-Highlights warning signals associated with potentially predatory or
-deceptive publishing practices.
+Surfaces warning signals that may require additional investigation
+before manuscript submission.
 
-### 🏢 Publisher & Journal Identity
+### 🏢 Publisher Verification
 
-Provides a structured way to examine publisher information, journal
-identity, domain details, and related signals.
+Provides a structured view of publisher and journal information to
+support research due diligence.
 
-### 📊 Researcher-Friendly Results
+### 📊 Research-Friendly Results
 
-The interface is designed to make complex verification signals easier to
-understand before making a publication decision.
-
-------------------------------------------------------------------------
-
-## 🖥️ Application Preview
-
-### Journal Verification Dashboard
-
-![ShodhGuard AI -- Journal Verification Dashboard](assets/app-home.png)
-
-The dashboard provides a quick verification workflow with:
-
--   Journal/domain input
--   Quick Smart Search
--   Dual Domain & ISSN Cross-Check
--   Journal identity verification
--   Cloning-risk indicators
--   Predatory-risk warnings
--   Indexing and journal-status signals
+The interface is designed to turn multiple verification signals into
+information that researchers can understand and investigate.
 
 ------------------------------------------------------------------------
 
-## 🎯 Why ShodhGuard AI?
+## 🎯 Why Shodh Setu AI?
 
-Choosing a journal is no longer simply about finding a journal with a
-familiar title.
+Selecting a journal should involve more than checking a journal's title
+or website.
 
-Researchers should verify:
+Before submission, researchers should ask:
 
--   Is the journal genuine?
--   Is the website authentic?
--   Is the journal actually indexed where it claims?
--   Is the ISSN associated with the correct journal?
--   Is the publisher information consistent?
--   Could the website be a cloned or impersonated journal?
--   Are there indicators of predatory publishing?
+-   Is this the legitimate journal website?
+-   Does the journal actually belong to the stated publisher?
+-   Is the ISSN associated with the correct publication?
+-   Are indexing claims verifiable?
+-   Could this be a cloned journal?
+-   Are there warning signs associated with deceptive or predatory
+    publishing?
+-   Has the journal's status changed recently?
 
-**ShodhGuard AI** aims to make these checks easier to perform before a
-manuscript is submitted.
+**Shodh Setu AI** is designed as a first layer of research due
+diligence.
 
 ------------------------------------------------------------------------
 
-## 🧠 Who Is It For?
+## 👥 Who Can Use It?
 
-ShodhGuard AI can be useful for:
+Shodh Setu AI is intended for:
 
 -   👨‍🏫 Faculty members
 -   🎓 PhD scholars
 -   🔬 Researchers
 -   🧑‍🎓 Postgraduate students
 -   🏛️ Universities and research institutions
--   📖 Research supervisors
--   📝 Academic editors and reviewers
+-   📝 Research supervisors
+-   📖 Academic editors and reviewers
+-   🌐 Research support and library teams
 
 ------------------------------------------------------------------------
 
-## 🚀 Getting Started
-
-Clone the repository:
-
-``` bash
-git clone https://github.com/YOUR-USERNAME/shodhguard-ai.git
-cd shodhguard-ai
-```
-
-Then follow the setup instructions for the application's technology
-stack.
-
-If the project is a static web application, it can be deployed using
-services such as GitHub Pages or another suitable web-hosting platform.
-
-------------------------------------------------------------------------
-
-## 📁 Suggested Project Structure
+## 🧭 How It Works
 
 ``` text
-shodhguard-ai/
+Journal / URL / ISSN
+        │
+        ▼
+Journal Identity Check
+        │
+        ├── Domain & Website Signals
+        ├── ISSN Cross-Check
+        ├── Indexing Signals
+        ├── Publisher Information
+        ├── Cloning-Risk Signals
+        └── Predatory-Risk Indicators
+        │
+        ▼
+Researcher Review
+        │
+        ▼
+Informed Publication Decision
+```
+
+The goal is not to replace scholarly judgment. It is to make the initial
+verification process faster, clearer, and more systematic.
+
+------------------------------------------------------------------------
+
+## 🟢 Example Risk Signals
+
+  -----------------------------------------------------------------------
+  Indicator                           Meaning
+  ----------------------------------- -----------------------------------
+  🟢 **Verified Journal**             Positive verification signals
+                                      identified
+
+  🔵 **Emerging / Regional**          Journal requires contextual
+                                      evaluation
+
+  🟠 **Predatory Risk Warning**       Additional due diligence is
+                                      recommended
+
+  🔴 **Cloned / Suspicious Domain**   Possible impersonation or cloning
+                                      concern
+  -----------------------------------------------------------------------
+
+**Important:** These indicators should be interpreted together with
+their underlying evidence.
+
+------------------------------------------------------------------------
+
+## 🔐 Responsible Use
+
+Shodh Setu AI is a **research-support and verification platform**, not a
+substitute for authoritative indexing databases, publishers, university
+policies, or researcher judgment.
+
+A risk warning does **not automatically prove** that a journal is
+fraudulent or predatory.
+
+Likewise, a positive result does not guarantee publication quality or
+future indexing status.
+
+Researchers should independently verify important information through
+authoritative sources before submitting a manuscript or paying any
+publication fee.
+
+------------------------------------------------------------------------
+
+## 🌐 Verification Philosophy
+
+### Verify first. Submit second.
+
+Shodh Setu AI is built around a simple principle:
+
+> **Research deserves a trustworthy publishing path.**
+
+The platform aims to help researchers slow down before submission,
+inspect the evidence, and make a more informed journal-selection
+decision.
+
+------------------------------------------------------------------------
+
+## 🛠️ Technology
+
+Depending on the implementation, Shodh Setu AI can integrate
+technologies such as:
+
+-   HTML5
+-   CSS3
+-   JavaScript / TypeScript
+-   React
+-   Node.js
+-   REST APIs
+-   Journal metadata services
+-   ISSN and indexing data sources
+-   Domain intelligence
+-   AI-assisted research analysis
+
+Update this section to reflect the exact technologies and services used
+in the production implementation.
+
+------------------------------------------------------------------------
+
+## 📁 Suggested Repository Structure
+
+``` text
+shodhsetu-ai/
 │
 ├── assets/
-│   └── app-home.png
+│   └── shodhsetu-ai-dashboard.png
 │
 ├── src/
 │   ├── components/
@@ -142,78 +246,82 @@ shodhguard-ai/
 └── LICENSE
 ```
 
-Adapt the structure above to match the actual implementation.
+------------------------------------------------------------------------
+
+## 🚀 Getting Started
+
+Clone the repository:
+
+``` bash
+git clone https://github.com/YOUR-USERNAME/shodhsetu-ai.git
+cd shodhsetu-ai
+```
+
+Install dependencies if applicable:
+
+``` bash
+npm install
+```
+
+Run the development server if applicable:
+
+``` bash
+npm run dev
+```
+
+Replace the commands above with the actual project setup if the
+implementation uses a different framework or deployment workflow.
 
 ------------------------------------------------------------------------
 
-## 🔐 Responsible Use
+## 📌 Project Status
 
-ShodhGuard AI is intended as a **research-support and verification
-tool**.
+**Research / Development Prototype**
 
-A risk indicator should not automatically be interpreted as proof that a
-journal is fraudulent or predatory. Researchers should independently
-verify important information through authoritative sources and the
-journal's legitimate publisher records before making publication
-decisions.
+The platform can be further developed through:
 
-Likewise, indexing information can change over time. Users should
-confirm current indexing status with the relevant indexing service
-before submission.
-
-------------------------------------------------------------------------
-
-## 🌐 Verification Philosophy
-
-ShodhGuard AI follows a simple principle:
-
-> **Verify first. Submit second.**
-
-The objective is not to replace the researcher's judgment, but to
-provide a structured first layer of due diligence.
+-   More authoritative indexing integrations
+-   ISSN and journal metadata verification
+-   Publisher verification
+-   Domain-age and domain-intelligence signals
+-   Advanced cloned-journal detection
+-   Improved predatory-risk assessment
+-   AI-assisted evidence summaries
+-   Journal history and change tracking
+-   Institutional research dashboards
 
 ------------------------------------------------------------------------
 
-## 🧪 Example Verification Signals
+## 🧪 Future Roadmap
 
-The platform may present signals such as:
+### Phase 1 --- Verification
 
-  -----------------------------------------------------------------------
-  Signal                              Purpose
-  ----------------------------------- -----------------------------------
-  🟢 Verified Journal                 Indicates a positive verification
-                                      signal
+-   Journal identity
+-   ISSN
+-   Domain
+-   Publisher
+-   Indexing signals
 
-  🔵 Emerging / Regional              Indicates an emerging or regional
-                                      journal signal
+### Phase 2 --- Research Integrity
 
-  🟠 Predatory Risk Warning           Indicates signals requiring
-                                      additional investigation
+-   Cloning detection
+-   Predatory-risk intelligence
+-   Publisher consistency checks
+-   Evidence-based warnings
 
-  🔴 Cloned / Suspicious Domain       Indicates a potentially
-                                      impersonated or cloned website
-  -----------------------------------------------------------------------
+### Phase 3 --- Researcher Intelligence
 
-These labels should be interpreted together with the underlying evidence
-rather than as standalone verdicts.
+-   Journal comparison
+-   Watchlists
+-   Verification history
+-   Submission-readiness checklist
 
-------------------------------------------------------------------------
+### Phase 4 --- Institutional Platform
 
-## 🛠️ Technology
-
-The project can be adapted to a modern web stack such as:
-
--   HTML5 / CSS3
--   JavaScript / TypeScript
--   React
--   Node.js
--   REST APIs
--   Journal and indexing databases
--   Domain/website verification services
--   AI-assisted research-integrity analysis
-
-Replace this section with the exact technologies used in the
-implementation.
+-   University dashboards
+-   Research office workflows
+-   Faculty verification records
+-   Research-integrity analytics
 
 ------------------------------------------------------------------------
 
@@ -223,49 +331,52 @@ implementation.
 
 Associate Professor / Program Leader\
 Amity School of Communication\
-Amity University Uttar Pradesh, Noida
+Amity University Uttar Pradesh, Noida, India
 
-**Focus Areas:**\
+**Research & Professional Interests**
+
 Artificial Intelligence • Media • Digital Research • Research Integrity
-• Digital Publishing
+• Digital Publishing • Generative AI
 
 ------------------------------------------------------------------------
 
-## 📌 Project Status
+## ⭐ Contributing
 
-**Development / Research Prototype**
+Contributions, suggestions, and research-integrity ideas are welcome.
 
-The project is intended to evolve through continuous improvement of:
+You can contribute by:
 
--   Verification sources
--   Indexing checks
--   Domain intelligence
--   Cloning detection
--   Research-integrity indicators
--   AI-assisted analysis
--   User experience
+1.  Forking the repository
+2.  Creating a feature branch
+3.  Making your changes
+4.  Testing the implementation
+5.  Opening a pull request
+
+Please ensure that proposed verification criteria are supported by
+reliable evidence and clearly documented.
 
 ------------------------------------------------------------------------
 
 ## 📄 License
 
-Add the project's chosen open-source license here, for example MIT,
-Apache-2.0, or another appropriate license.
+Add the appropriate open-source license here, such as **MIT**,
+**Apache-2.0**, or another license selected for the project.
 
 ------------------------------------------------------------------------
 
-## ⭐ Support the Project
+## ⚠️ Disclaimer
 
-If you find ShodhGuard AI useful for research and academic publishing:
+Shodh Setu AI is intended to support academic due diligence.
 
--   ⭐ Star the repository
--   🐛 Report bugs
--   💡 Suggest improvements
--   🔬 Contribute research-integrity ideas
--   🔗 Share the project with researchers and scholars
+The platform does not make a final determination about the legitimacy,
+quality, indexing status, or ethical standing of any journal solely from
+an automated result. Users remain responsible for checking authoritative
+sources and institutional requirements before submission.
 
 ------------------------------------------------------------------------
 
-### ShodhGuard AI
+## 🌉 SHODH SETU AI
 
-**Verify. Trust. Publish.**
+**Research Integrity Intelligence**
+
+### Verify. Connect. Publish with Confidence.
