@@ -215,6 +215,7 @@ export interface VerificationResult {
     nextSteps: string[];
   };
   limitations: string;
+  publicationBehaviour?: PublicationBehaviourAnalysis;
 }
 
 export interface SavedJournalEntry {
@@ -278,5 +279,105 @@ export interface ForensicEmailAlertData {
   counterfeitHost: string;
   infringingUrl: string;
   summary: string;
+}
+
+export type DelistedIndexSource = 'Scopus' | 'Web of Science' | 'DOAJ' | 'UGC-CARE';
+
+export interface DelistedJournal {
+  id: string;
+  title: string;
+  issn: string;
+  eIssn?: string;
+  publisher: string;
+  delistedFrom: DelistedIndexSource[];
+  delistedYear: number;
+  reason: string;
+  category: 'peer_review_papermill' | 'citation_manipulation' | 'volume_relevance' | 'predatory_clone' | 'publication_malpractice';
+  status: 'DELISTED' | 'DISCONTINUED' | 'SUPPRESSED' | 'ON_HOLD';
+  lastKnownIndexedVolume?: string;
+  sharedBy?: string;
+  dateAdded: string;
+  evidenceSource?: string;
+  officialWebsite?: string;
+  notes?: string;
+}
+
+export interface PlatformStats {
+  visitors: number;
+  journalsExamined: number;
+  clonesTracked: number;
+  delistedRecorded: number;
+}
+
+export type VolumeAnomalyTier = 
+  | 'NORMAL' 
+  | 'PUBLICATION_INCREASE'       // 🟡
+  | 'SIGNIFICANT_GROWTH'          // 🟠
+  | 'UNUSUAL_PATTERN'             // 🔴
+  | 'MAJOR_VOLUME_ANOMALY';       // 🚨
+
+export interface VolumeAnomalyExplanation {
+  type: 'ISSUE_FREQUENCY' | 'PAPERS_PER_ISSUE' | 'ANNUAL_VOLUME' | 'SPECIAL_ISSUE_SURGE';
+  title: string;
+  description: string;
+  historicalBaselineText: string;
+  currentValueText: string;
+  percentageChange: number;
+}
+
+export interface AnnualPublicationRecord {
+  year: number;
+  issues: number;
+  papers: number;
+  papersPerIssue: number;
+  regularIssues: number;
+  specialIssues: number;
+  supplements: number;
+  continuousPublication?: boolean;
+  onlineFirstCount?: number;
+  pctChangeFromPrevYear: number;
+  status: 'Normal' | 'Moderate Increase' | 'Significant Increase' | 'Major Anomaly' | 'Decline';
+  notes?: string;
+}
+
+export interface PublicationBehaviourAnalysis {
+  journalTitle: string;
+  issn: string;
+  publisher: string;
+  historicalBaseline: {
+    baselineYears: string; // e.g. "2020 – 2024"
+    avgIssuesPerYear: number;
+    avgPapersPerIssue: number;
+    avgPapersPerYear: number;
+  };
+  currentPeriod: {
+    year: number;
+    issues: number;
+    papers: number;
+    papersPerIssue: number;
+    pctIncreaseIssues: number;
+    pctIncreasePapersPerIssue: number;
+    pctIncreaseTotalPapers: number;
+  };
+  anomalyTier: VolumeAnomalyTier;
+  flagLabels: {
+    severity: 'yellow' | 'orange' | 'red' | 'critical';
+    label: string; // e.g. "🟡 Publication Increase", "🔴 Unusual Publication Pattern", etc.
+  }[];
+  explanations: VolumeAnomalyExplanation[];
+  yearlyData: AnnualPublicationRecord[];
+  summaryText: string;
+  specialIssueBreakdown: {
+    regularIssuesCount: number;
+    specialIssuesCount: number;
+    supplementsCount: number;
+    specialIssuePercentage: number;
+    hasHighSpecialIssueRatio: boolean;
+  };
+  delistedNotice?: {
+    isDelisted: boolean;
+    reason?: string;
+    delistedFrom?: string[];
+  };
 }
 

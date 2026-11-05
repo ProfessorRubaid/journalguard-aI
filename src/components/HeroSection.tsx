@@ -22,13 +22,14 @@ import {
   BookMarked
 } from 'lucide-react';
 import { DEMO_PRESET_JOURNALS } from '../services/demoData';
-import { VerificationInputOptions } from '../types';
+import { VerificationInputOptions, PlatformStats } from '../types';
 
 interface HeroSectionProps {
   onVerify: (query: string | VerificationInputOptions) => void;
   onNavigateTab: (tab: string) => void;
   isLoading: boolean;
   onOpenOnlineAccess?: () => void;
+  stats?: PlatformStats;
 }
 
 export const HeroSection: React.FC<HeroSectionProps> = ({
@@ -36,6 +37,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
   onNavigateTab,
   isLoading,
   onOpenOnlineAccess,
+  stats,
 }) => {
   const [searchInput, setSearchInput] = useState('');
   const [isAdvancedMode, setIsAdvancedMode] = useState(false);
@@ -115,9 +117,44 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
         </h1>
 
         {/* Supporting description */}
-        <p className="max-w-2xl mx-auto text-base sm:text-lg text-slate-600 mb-8 font-normal leading-relaxed">
+        <p className="max-w-2xl mx-auto text-base sm:text-lg text-slate-600 dark:text-slate-300 mb-6 font-normal leading-relaxed">
           Check indexing, journal identity, publisher information, cloning risks, and predatory-risk indicators before submitting your research.
         </p>
+
+        {/* Google-Themed Live Statistics Strip (Visitors & Journals Examined) */}
+        {stats && (
+          <div className="mb-8 flex flex-wrap items-center justify-center gap-2.5 max-w-4xl mx-auto">
+            {/* Google Blue: Users Visited */}
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-800 text-blue-900 dark:text-blue-200 text-xs font-semibold shadow-2xs">
+              <span className="w-2 h-2 rounded-full bg-[#4285F4] animate-pulse" />
+              <span>👥 <strong className="font-extrabold text-blue-700 dark:text-blue-300">{stats.visitors.toLocaleString()}+</strong> Users Visited</span>
+            </div>
+
+            {/* Google Green: Journals Examined */}
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 text-emerald-900 dark:text-emerald-200 text-xs font-semibold shadow-2xs">
+              <span className="w-2 h-2 rounded-full bg-[#34A853]" />
+              <span>🔍 <strong className="font-extrabold text-emerald-700 dark:text-emerald-300">{stats.journalsExamined.toLocaleString()}+</strong> Journals Examined</span>
+            </div>
+
+            {/* Google Red: Cloned / Predatory Tracked */}
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800 text-rose-900 dark:text-rose-200 text-xs font-semibold shadow-2xs">
+              <span className="w-2 h-2 rounded-full bg-[#EA4335]" />
+              <span>⛔ <strong className="font-extrabold text-rose-700 dark:text-rose-300">{stats.clonesTracked.toLocaleString()}+</strong> Known Clones Tracked</span>
+            </div>
+
+            {/* Google Yellow: Delisted Repository */}
+            <button
+              type="button"
+              onClick={() => onNavigateTab('delisted')}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-50 hover:bg-amber-100 dark:bg-amber-950/60 dark:hover:bg-amber-900/80 border border-amber-300 dark:border-amber-700 text-amber-900 dark:text-amber-200 text-xs font-semibold transition-colors cursor-pointer shadow-2xs group"
+              title="Browse & Share Delisted Journals Repository"
+            >
+              <span className="w-2 h-2 rounded-full bg-[#FBBC05]" />
+              <span>📋 <strong className="font-extrabold text-amber-800 dark:text-amber-300">{stats.delistedRecorded.toLocaleString()}+</strong> Delisted Serials</span>
+              <ArrowRight className="w-3 h-3 text-amber-700 dark:text-amber-300 transition-transform group-hover:translate-x-0.5" />
+            </button>
+          </div>
+        )}
 
         {/* Mode Toggle Tab */}
         <div className="flex items-center justify-center gap-2 mb-4">

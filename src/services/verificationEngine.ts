@@ -40,6 +40,7 @@ import { calculateAuthenticityScore } from './authenticityEngine';
 import { calculateResearchFit } from './researchFitEngine';
 import { getDemoVerificationResult } from './demoData';
 import { lookupHijackedRegistry } from './hijackedRegistry';
+import { analyzePublicationBehaviour } from './publicationVolumeEngine';
 
 export { 
   compareDomainWithAuthoritative, 
@@ -77,16 +78,24 @@ export async function verifyJournal(
 
   // 1. Synthetic Demo Presets
   if (cleanInput.includes('demo-verified') || cleanInput === '2050-4829') {
-    return getDemoVerificationResult('verified');
+    const res = getDemoVerificationResult('verified');
+    res.publicationBehaviour = analyzePublicationBehaviour(res.journal, res.sources, res.cloneGuard, res.riskAnalysis);
+    return res;
   }
   if (cleanInput.includes('demo-cloned') || cleanInput.includes('swiss-review-informatics-journal.com')) {
-    return getDemoVerificationResult('cloned');
+    const res = getDemoVerificationResult('cloned');
+    res.publicationBehaviour = analyzePublicationBehaviour(res.journal, res.sources, res.cloneGuard, res.riskAnalysis);
+    return res;
   }
   if (cleanInput.includes('demo-predatory') || cleanInput.includes('rapid-acceptance-international-publishing.org')) {
-    return getDemoVerificationResult('suspicious');
+    const res = getDemoVerificationResult('suspicious');
+    res.publicationBehaviour = analyzePublicationBehaviour(res.journal, res.sources, res.cloneGuard, res.riskAnalysis);
+    return res;
   }
   if (cleanInput.includes('demo-nonindexed') || cleanInput === '2456-9124') {
-    return getDemoVerificationResult('non_indexed');
+    const res = getDemoVerificationResult('non_indexed');
+    res.publicationBehaviour = analyzePublicationBehaviour(res.journal, res.sources, res.cloneGuard, res.riskAnalysis);
+    return res;
   }
 
   // Check input components for known hijacked serials
@@ -666,6 +675,26 @@ export async function verifyJournal(
       scopus: scopusRes.sourceResult,
       wos: wosRes.sourceResult,
     },
+    publicationBehaviour: analyzePublicationBehaviour(
+      journal, 
+      {
+        issn: {
+          source: 'issn_portal',
+          displayName: 'ISSN Register',
+          status: issnStatus,
+          statusLabel: issnStatus === 'VERIFIED' ? 'VERIFIED' : 'NOT VERIFIED',
+          details: issnDetails,
+          lastChecked: timestamp,
+        },
+        crossref: crossrefRes.sourceResult,
+        openalex: openAlexRes.sourceResult,
+        doaj: doajRes.sourceResult,
+        scopus: scopusRes.sourceResult,
+        wos: wosRes.sourceResult,
+      }, 
+      cloneAssessment, 
+      riskAnalysis
+    ),
     recommendation: {
       status: finalStatus,
       summary: recSummary,

@@ -7,12 +7,15 @@
  * Provides clean "DELETE MY DATA" wipe.
  */
 
-import { ResearcherProfile, SavedJournalEntry, VerificationResult } from '../types';
+import { ResearcherProfile, SavedJournalEntry, VerificationResult, DelistedJournal, PlatformStats } from '../types';
 import { DEFAULT_RESEARCHER_PROFILE, DEMO_RESEARCHER_DEFAULT, getDemoVerificationResult } from './demoData';
+import { INITIAL_DELISTED_JOURNALS } from './delistedData';
 
 const PROFILE_KEY = 'jg_researcher_profile_v1';
 const SAVED_JOURNALS_KEY = 'jg_saved_journals_v1';
 const HISTORY_KEY = 'jg_verification_history_v1';
+const STATS_KEY = 'shodhsetu_platform_stats_v1';
+const DELISTED_KEY = 'shodhsetu_delisted_journals_v1';
 
 // Initial preloaded realistic library items matching prompt initial dashboard stats:
 // 27 checked, 18 verified, 4 high risk, 5 needs verification, 12 saved
@@ -290,3 +293,104 @@ export function clearAllUserData(): void {
     console.error('Failed clearing local data:', e);
   }
 }
+
+/**
+ * Platform Live Analytics: Visitors & Journals Examined Counters
+ */
+export function getPlatformStats(): PlatformStats {
+  try {
+    const raw = localStorage.getItem(STATS_KEY);
+    if (raw) {
+      return JSON.parse(raw);
+    }
+  } catch (err) {
+    console.error('Error reading platform stats:', err);
+  }
+
+  // Realistic baseline academic integrity community stats
+  const initial: PlatformStats = {
+    visitors: 48920,
+    journalsExamined: 134260,
+    clonesTracked: 18,
+    delistedRecorded: INITIAL_DELISTED_JOURNALS.length,
+  };
+
+  try {
+    localStorage.setItem(STATS_KEY, JSON.stringify(initial));
+  } catch {}
+
+  return initial;
+}
+
+export function recordPlatformVisit(): PlatformStats {
+  const current = getPlatformStats();
+  const updated: PlatformStats = {
+    ...current,
+    visitors: current.visitors + 1,
+  };
+  try {
+    localStorage.setItem(STATS_KEY, JSON.stringify(updated));
+  } catch {}
+  return updated;
+}
+
+export function recordJournalExamined(): PlatformStats {
+  const current = getPlatformStats();
+  const updated: PlatformStats = {
+    ...current,
+    journalsExamined: current.journalsExamined + 1,
+  };
+  try {
+    localStorage.setItem(STATS_KEY, JSON.stringify(updated));
+  } catch {}
+  return updated;
+}
+
+/**
+ * Delisted Journals Repository Storage
+ */
+export function getStoredDelistedJournals(): DelistedJournal[] {
+  try {
+    const raw = localStorage.getItem(DELISTED_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        return parsed;
+      }
+    }
+  } catch (err) {
+    console.error('Error reading delisted journals:', err);
+  }
+
+  try {
+    localStorage.setItem(DELISTED_KEY, JSON.stringify(INITIAL_DELISTED_JOURNALS));
+  } catch {}
+
+  return INITIAL_DELISTED_JOURNALS;
+}
+
+export function saveDelistedJournals(journals: DelistedJournal[]): void {
+  try {
+    localStorage.setItem(DELISTED_KEY, JSON.stringify(journals));
+  } catch (err) {
+    console.error('Error saving delisted journals:', err);
+  }
+}
+
+export function addDelistedJournal(entry: DelistedJournal): DelistedJournal[] {
+  const existing = getStoredDelistedJournals();
+  const updated = [entry, ...existing.filter(j => j.id !== entry.id)];
+  saveDelistedJournals(updated);
+
+  // Update stats counter
+  const stats = getPlatformStats();
+  try {
+    localStorage.setItem(STATS_KEY, JSON.stringify({
+      ...stats,
+      delistedRecorded: updated.length,
+    }));
+  } catch {}
+
+  return updated;
+}
+

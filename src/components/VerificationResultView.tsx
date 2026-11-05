@@ -28,10 +28,12 @@ import {
   ChevronUp,
   AlertOctagon,
   Network,
-  Mail
+  Mail,
+  BarChart3
 } from 'lucide-react';
 import { VerificationResult, ResearcherProfile } from '../types';
 import { EditorAlertModal } from './EditorAlertModal';
+import { JournalBehaviourMonitor } from './JournalBehaviourMonitor';
 
 interface VerificationResultViewProps {
   result: VerificationResult;
@@ -214,6 +216,18 @@ export const VerificationResultView: React.FC<VerificationResultViewProps> = ({
             >
               <FileText className="w-4 h-4" />
               <span>Audit Report</span>
+            </button>
+
+            <button
+              onClick={() => {
+                const el = document.getElementById('journal-behaviour-monitor') || document.getElementById('publication-behaviour-monitor');
+                if (el) el.scrollIntoView({ behavior: 'smooth' });
+              }}
+              className="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-indigo-50 hover:bg-indigo-100 text-indigo-800 dark:bg-indigo-950/70 dark:text-indigo-300 dark:hover:bg-indigo-900 border border-indigo-200 dark:border-indigo-800 flex items-center gap-1.5 transition-all shadow-2xs cursor-pointer"
+              title="Jump to Journal Publication Behaviour & Volume Anomaly Monitor"
+            >
+              <BarChart3 className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+              <span>Publication Behaviour</span>
             </button>
 
             {isPredatoryOrClone && (
@@ -727,6 +741,9 @@ export const VerificationResultView: React.FC<VerificationResultViewProps> = ({
           </p>
         </div>
       </div>
+
+      {/* NEW FEATURE: Journal Publication Behaviour / Volume Anomaly Monitor */}
+      <JournalBehaviourMonitor currentResult={result} result={result} />
 
       {/* Section: DOES THIS JOURNAL SUIT YOUR RESEARCH? */}
       <div className="p-6 rounded-3xl bg-white border border-slate-200 shadow-sm space-y-4">

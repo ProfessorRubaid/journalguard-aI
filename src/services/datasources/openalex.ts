@@ -71,6 +71,7 @@ export async function queryOpenAlex(query: string, issn?: string): Promise<{
               homepageUrl,
               hIndex,
               worksCount,
+              countsByYear: top.counts_by_year || [],
             },
             lastChecked: timestamp,
             latencyMs: Math.round(performance.now() - start),

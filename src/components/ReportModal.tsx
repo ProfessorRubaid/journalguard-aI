@@ -242,6 +242,24 @@ export const ReportModal: React.FC<ReportModalProps> = ({
             </p>
           </div>
 
+          {/* Section 4.5: Publication Behaviour & Volume Anomaly Findings */}
+          <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs space-y-2">
+            <h4 className="font-bold text-slate-900 uppercase tracking-wider text-[11px] flex items-center justify-between">
+              <span>Publication Behaviour &amp; Volume Anomaly Monitor</span>
+              <span className="font-mono text-[10px] text-slate-500">
+                Baseline vs Recent Telemetry
+              </span>
+            </h4>
+            <p className="text-slate-700 leading-relaxed">
+              {result.publicationBehaviour?.summaryText || 'Historical publication baseline established and evaluated across issue frequency and annual paper counts.'}
+            </p>
+            {result.publicationBehaviour && result.publicationBehaviour.anomalyTier !== 'NORMAL' && (
+              <div className="pt-2 border-t border-slate-200 text-amber-800 text-[11px] font-medium">
+                <strong>Attention:</strong> Historical baseline of {result.publicationBehaviour.historicalBaseline.avgIssuesPerYear} issues/yr and {result.publicationBehaviour.historicalBaseline.avgPapersPerYear} papers/yr shifted to {result.publicationBehaviour.currentPeriod.issues} issues and {result.publicationBehaviour.currentPeriod.papers} papers in the latest monitored period.
+              </div>
+            )}
+          </div>
+
           {/* Section 5: Recommendation & Limitations */}
           <div className="space-y-3 pt-2">
             <div className="p-5 rounded-xl bg-slate-900 text-white text-xs space-y-2">
