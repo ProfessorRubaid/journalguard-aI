@@ -394,3 +394,32 @@ export function addDelistedJournal(entry: DelistedJournal): DelistedJournal[] {
   return updated;
 }
 
+export function addDelistedJournalsBatch(entries: DelistedJournal[]): DelistedJournal[] {
+  const existing = getStoredDelistedJournals();
+  const existingIssns = new Set(existing.map(j => (j.issn || '').toLowerCase().trim()).filter(Boolean));
+  const existingTitles = new Set(existing.map(j => (j.title || '').toLowerCase().trim()).filter(Boolean));
+
+  // Filter out exact duplicates while keeping new records
+  const uniqueNew = entries.filter(e => {
+    const issnKey = (e.issn || '').toLowerCase().trim();
+    const titleKey = (e.title || '').toLowerCase().trim();
+    if (issnKey && existingIssns.has(issnKey)) return false;
+    if (titleKey && existingTitles.has(titleKey)) return false;
+    return true;
+  });
+
+  const updated = [...uniqueNew, ...existing];
+  saveDelistedJournals(updated);
+
+  // Update stats counter
+  const stats = getPlatformStats();
+  try {
+    localStorage.setItem(STATS_KEY, JSON.stringify({
+      ...stats,
+      delistedRecorded: updated.length,
+    }));
+  } catch {}
+
+  return updated;
+}
+

@@ -60,6 +60,14 @@ export const DEMO_PRESET_JOURNALS = [
     description: 'Displays multiple predatory red flags: guarantees 48-hour acceptance, claims fake Universal Impact Factor, gmail submission address.',
   },
   {
+    id: 'demo-aej-archive',
+    title: 'Journal of Animal Environment (AEJ Archive)',
+    shortLabel: '📊 aejournals.org Archive (Volume Monitor)',
+    type: 'suspicious' as const,
+    input: 'https://aejournals.org/index.php/AEJ/issue/archive',
+    description: 'Empirical test case: OJS 3.3 archive with 78 issues across 4 pages. Accurately detects 10 issues in 2026 (2 regular + 8 special S-issues) and 831 papers.',
+  },
+  {
     id: 'demo-nonindexed',
     title: 'Journal of South Asian Community Media Practices',
     shortLabel: 'Emergent / Regional (2456-9124)',

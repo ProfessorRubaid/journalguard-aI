@@ -26,13 +26,17 @@ import {
   Info,
   ChevronDown,
   Globe,
-  FileText
+  FileText,
+  FileSpreadsheet,
+  UploadCloud
 } from 'lucide-react';
 import { DelistedJournal, DelistedIndexSource, ResearcherProfile } from '../types';
+import { ExcelUploadModal } from './ExcelUploadModal';
 
 interface DelistedRepositoryViewProps {
   journals: DelistedJournal[];
   onAddJournal: (journal: DelistedJournal) => void;
+  onAddBatchJournals?: (journals: DelistedJournal[]) => void;
   onVerifyJournal: (query: string) => void;
   profile?: ResearcherProfile;
 }
@@ -40,6 +44,7 @@ interface DelistedRepositoryViewProps {
 export const DelistedRepositoryView: React.FC<DelistedRepositoryViewProps> = ({
   journals,
   onAddJournal,
+  onAddBatchJournals,
   onVerifyJournal,
   profile,
 }) => {
@@ -48,6 +53,7 @@ export const DelistedRepositoryView: React.FC<DelistedRepositoryViewProps> = ({
   const [selectedCategoryFilter, setSelectedCategoryFilter] = useState<string>('ALL');
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [isSubmitModalOpen, setIsSubmitModalOpen] = useState(false);
+  const [isExcelModalOpen, setIsExcelModalOpen] = useState(false);
 
   // New Delisted Journal Form State
   const [formTitle, setFormTitle] = useState('');
@@ -207,6 +213,16 @@ export const DelistedRepositoryView: React.FC<DelistedRepositoryViewProps> = ({
 
             {/* Quick Actions */}
             <div className="flex flex-wrap items-center gap-2.5 shrink-0 self-stretch sm:self-auto">
+              <button
+                type="button"
+                onClick={() => setIsExcelModalOpen(true)}
+                className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs flex items-center gap-2 transition-all shadow-md active:scale-95 cursor-pointer"
+                title="Upload Excel (.xlsx, .xls) or CSV spreadsheet containing multiple discontinued journals"
+              >
+                <FileSpreadsheet className="w-4 h-4" />
+                <span>Upload Excel / CSV List</span>
+              </button>
+
               <button
                 type="button"
                 onClick={() => setIsSubmitModalOpen(true)}
@@ -644,6 +660,21 @@ export const DelistedRepositoryView: React.FC<DelistedRepositoryViewProps> = ({
           </div>
         </div>
       )}
+
+      {/* Excel / CSV Spreadsheet Upload Modal */}
+      <ExcelUploadModal
+        isOpen={isExcelModalOpen}
+        onClose={() => setIsExcelModalOpen(false)}
+        onImportBatch={(batch) => {
+          if (onAddBatchJournals) {
+            onAddBatchJournals(batch);
+          } else {
+            batch.forEach(j => onAddJournal(j));
+          }
+        }}
+        existingJournals={journals}
+        profile={profile}
+      />
 
     </div>
   );

@@ -325,6 +325,42 @@ export interface VolumeAnomalyExplanation {
   percentageChange: number;
 }
 
+export interface IssueArticleItem {
+  id: string;
+  title: string;
+  url: string;
+  type?: string; // e.g. "Research Article", "Review Article", "Original Article"
+  doi?: string;
+  authors?: string;
+  pages?: string;
+}
+
+export interface IssueDrillDownItem {
+  id?: string;
+  volume?: string;
+  issueNumber?: string;
+  issueTitle: string;
+  issueType: 'Regular' | 'Special' | 'Supplement';
+  articlesCount: number;
+  url: string;
+  source: string; // e.g. "Issue page: https://aejournals.org/index.php/AEJ/issue/view/82"
+  year: number;
+  articles?: IssueArticleItem[];
+}
+
+export interface ArchiveAuditCoverage {
+  archiveUrl: string;
+  totalArchivePagesCrawled: number;
+  issuesDetected: number;
+  issuesProcessed: number;
+  issuesFailed: number;
+  totalArticlesCounted: number;
+  duplicateArticlesFiltered: number;
+  crawledAt: string;
+  isRealTimeCrawl: boolean;
+  statusMessage?: string;
+}
+
 export interface AnnualPublicationRecord {
   year: number;
   issues: number;
@@ -338,12 +374,15 @@ export interface AnnualPublicationRecord {
   pctChangeFromPrevYear: number;
   status: 'Normal' | 'Moderate Increase' | 'Significant Increase' | 'Major Anomaly' | 'Decline';
   notes?: string;
+  issueList?: IssueDrillDownItem[];
 }
 
 export interface PublicationBehaviourAnalysis {
   journalTitle: string;
   issn: string;
   publisher: string;
+  archiveAudit?: ArchiveAuditCoverage;
+  allIssuesList?: IssueDrillDownItem[];
   historicalBaseline: {
     baselineYears: string; // e.g. "2020 – 2024"
     avgIssuesPerYear: number;

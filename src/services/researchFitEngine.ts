@@ -17,7 +17,7 @@ export function calculateResearchFit(
   journalTitle: string,
   subjectAreas: string[],
   scopeDescription: string = '',
-  profile: ResearcherProfile,
+  profile?: ResearcherProfile,
   isOa: boolean = false,
   isIndexed: boolean = false
 ): ResearchFitScore {
@@ -25,8 +25,8 @@ export function calculateResearchFit(
   
   // Researcher terms
   const allTerms = [
-    ...profile.researchAreas,
-    ...profile.keywords,
+    ...(profile?.researchAreas || ['Multidisciplinary']),
+    ...(profile?.keywords || []),
   ];
 
   const matchingKeywords: string[] = [];
@@ -42,7 +42,8 @@ export function calculateResearchFit(
 
   // Calculate 1. Subject Fit (max 35)
   let subjectFit = 12; // baseline for academic venues
-  const matchRatio = Math.min(1, matchingKeywords.length / Math.max(2, profile.keywords.length));
+  const profileKeywordsLength = profile?.keywords?.length || 2;
+  const matchRatio = Math.min(1, matchingKeywords.length / Math.max(2, profileKeywordsLength));
   subjectFit = Math.round(12 + matchRatio * 23);
 
   // 2. Scope Match (max 25)
@@ -74,7 +75,8 @@ export function calculateResearchFit(
   if (matchingKeywords.length > 0) {
     explanation = `High contextual overlap with your research portfolio in ${matchingKeywords.slice(0, 3).join(', ')}.`;
   } else {
-    explanation = `The journal focus does not directly intersect with your profile keywords (${profile.keywords.slice(0, 3).join(', ')}).`;
+    const kwText = profile?.keywords && profile.keywords.length > 0 ? profile.keywords.slice(0, 3).join(', ') : 'stated research focus';
+    explanation = `The journal focus does not directly intersect with your profile keywords (${kwText}).`;
   }
 
   return {

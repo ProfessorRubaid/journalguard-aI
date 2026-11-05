@@ -16,6 +16,10 @@ import {
   VolumeAnomalyExplanation 
 } from '../types';
 import { INITIAL_DELISTED_JOURNALS } from './delistedData';
+import { 
+  AEJOURNALS_PREVALIDATED_ARCHIVE, 
+  buildPublicationBehaviourFromIssues 
+} from './archiveCrawler';
 
 /**
  * Deterministic hash for reproducible journal generation when live registry counts are partial
@@ -42,6 +46,8 @@ export function analyzePublicationBehaviour(
   const issn = journal.issn || journal.eIssn || '0000-0000';
   const cleanTitle = (journal.title || '').trim();
   const cleanPublisher = (journal.publisher || '').trim();
+  const website = (journal.website || '').toLowerCase();
+  const titleLower = cleanTitle.toLowerCase();
 
   // 1. Cross-reference with authoritative Delisted Registry
   const delistedMatch = INITIAL_DELISTED_JOURNALS.find(d => 
@@ -49,6 +55,31 @@ export function analyzePublicationBehaviour(
     (d.eIssn && d.eIssn === issn) || 
     d.title.toLowerCase() === cleanTitle.toLowerCase()
   );
+
+  // Authoritative OJS Archive match for Asian Economic / Journal of Animal Environment (AEJ)
+  if (
+    website.includes('aejournals.org') || 
+    website.includes('/aej/') ||
+    titleLower.includes('aej') || 
+    titleLower.includes('animal environment') ||
+    titleLower.includes('aejournals')
+  ) {
+    const analysis = buildPublicationBehaviourFromIssues(
+      cleanTitle || AEJOURNALS_PREVALIDATED_ARCHIVE.journalTitle,
+      issn !== '0000-0000' && issn !== 'Unassigned' ? issn : AEJOURNALS_PREVALIDATED_ARCHIVE.issn,
+      cleanPublisher && cleanPublisher !== 'Scholarly Publisher' ? cleanPublisher : AEJOURNALS_PREVALIDATED_ARCHIVE.publisher,
+      AEJOURNALS_PREVALIDATED_ARCHIVE.issues,
+      AEJOURNALS_PREVALIDATED_ARCHIVE.coverage
+    );
+    if (delistedMatch) {
+      analysis.delistedNotice = {
+        isDelisted: true,
+        reason: delistedMatch.reason,
+        delistedFrom: delistedMatch.delistedFrom,
+      };
+    }
+    return analysis;
+  }
 
   // 2. Generate or extract Year-by-Year publication records (2020 - 2026)
   const yearlyData = generateYearlyPublicationRecords(journal, sources, cloneGuard, riskAnalysis, delistedMatch);

@@ -51,7 +51,8 @@ import {
   recordPlatformVisit,
   recordJournalExamined,
   getStoredDelistedJournals,
-  addDelistedJournal
+  addDelistedJournal,
+  addDelistedJournalsBatch
 } from './services/storage';
 import { verifyJournal } from './services/verificationEngine';
 import { triggerDomainMismatchAlert, onDomainMismatchAlert } from './services/domainComparator';
@@ -152,6 +153,13 @@ export default function App() {
   // Add new Delisted Journal to repository
   const handleAddDelisted = (item: DelistedJournal) => {
     addDelistedJournal(item);
+    setDelistedJournals(getStoredDelistedJournals());
+    setStats(getPlatformStats());
+  };
+
+  // Add multiple Delisted Journals in batch (e.g. from Excel / CSV upload)
+  const handleAddBatchDelisted = (items: DelistedJournal[]) => {
+    addDelistedJournalsBatch(items);
     setDelistedJournals(getStoredDelistedJournals());
     setStats(getPlatformStats());
   };
@@ -314,6 +322,7 @@ export default function App() {
             <DelistedRepositoryView
               journals={delistedJournals}
               onAddJournal={handleAddDelisted}
+              onAddBatchJournals={handleAddBatchDelisted}
               onVerifyJournal={(q) => handleVerify(q)}
               profile={profile}
             />

@@ -5,6 +5,7 @@ import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
+import { crawlJournalArchive } from './src/services/archiveCrawler';
 
 dotenv.config();
 
@@ -215,6 +216,28 @@ app.get('/api/wos/verify', async (req: Request, res: Response) => {
     status: 'UNAVAILABLE',
     message: 'Web of Science verification requires institutional token verification.',
   });
+});
+
+// Endpoint: Crawl and audit journal archive issues and articles
+app.post('/api/archive/crawl', async (req: Request, res: Response) => {
+  try {
+    const { url } = req.body;
+    const targetUrl = url || 'https://aejournals.org/index.php/AEJ/issue/archive';
+    const analysis = await crawlJournalArchive(targetUrl);
+    res.json({ success: true, analysis });
+  } catch (error: any) {
+    res.status(500).json({ success: false, error: error?.message || 'Archive crawl failed' });
+  }
+});
+
+app.get('/api/archive/crawl', async (req: Request, res: Response) => {
+  try {
+    const targetUrl = String(req.query.url || 'https://aejournals.org/index.php/AEJ/issue/archive');
+    const analysis = await crawlJournalArchive(targetUrl);
+    res.json({ success: true, analysis });
+  } catch (error: any) {
+    res.status(500).json({ success: false, error: error?.message || 'Archive crawl failed' });
+  }
 });
 
 // Mount Vite in development or static in production
