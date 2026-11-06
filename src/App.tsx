@@ -25,6 +25,8 @@ import { OnlineAccessModal } from './components/OnlineAccessModal';
 import { EditorAlertModal } from './components/EditorAlertModal';
 import { ClonedJournalsRoll } from './components/ClonedJournalsRoll';
 import { DelistedRepositoryView } from './components/DelistedRepositoryView';
+import { CfpDiscoveryView } from './components/CfpDiscoveryView';
+import { ResearchIntelligenceView } from './components/research_intelligence/ResearchIntelligenceView';
 import { AlertOctagon, ShieldAlert, ArrowRight, Mail } from 'lucide-react';
 
 import { 
@@ -34,7 +36,8 @@ import {
   VerificationInputOptions,
   DomainMismatchAlert,
   DelistedJournal,
-  PlatformStats
+  PlatformStats,
+  CfpNotificationItem
 } from './types';
 import { 
   getStoredProfile, 
@@ -52,14 +55,19 @@ import {
   recordJournalExamined,
   getStoredDelistedJournals,
   addDelistedJournal,
-  addDelistedJournalsBatch
+  addDelistedJournalsBatch,
+  getStoredCfpNotifications,
+  saveCfpNotifications,
+  markCfpNotificationAsRead,
+  markAllCfpNotificationsAsRead
 } from './services/storage';
+import { generateCfpNotificationsForProfile } from './services/cfpService';
 import { verifyJournal } from './services/verificationEngine';
 import { triggerDomainMismatchAlert, onDomainMismatchAlert } from './services/domainComparator';
 import { DEMO_RESEARCHER_DEFAULT } from './services/demoData';
 
 export default function App() {
-  const [currentTab, setCurrentTab] = useState<'home' | 'dashboard' | 'finder' | 'library' | 'checklist' | 'academy' | 'delisted'>('home');
+  const [currentTab, setCurrentTab] = useState<'home' | 'intelligence' | 'dashboard' | 'finder' | 'cfp' | 'library' | 'checklist' | 'academy' | 'delisted'>('home');
   const [profile, setProfile] = useState<ResearcherProfile>(getStoredProfile);
   const [savedJournals, setSavedJournals] = useState<SavedJournalEntry[]>(getSavedJournals);
   const [history, setHistory] = useState<VerificationResult[]>(getStoredHistory);
@@ -67,6 +75,7 @@ export default function App() {
   const [stats, setStats] = useState<PlatformStats>(getPlatformStats);
   const [currentResult, setCurrentResult] = useState<VerificationResult | null>(null);
   const [isVerifying, setIsVerifying] = useState(false);
+  const [cfpNotifications, setCfpNotifications] = useState<CfpNotificationItem[]>(getStoredCfpNotifications);
 
   // Modals state
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
@@ -77,6 +86,26 @@ export default function App() {
   const [isOnlineAccessOpen, setIsOnlineAccessOpen] = useState(false);
   const [isEditorAlertOpen, setIsEditorAlertOpen] = useState(false);
   const [compareList, setCompareList] = useState<SavedJournalEntry[]>([]);
+
+  // Automatically check for new verified Call for Papers matching researcher profile interests
+  useEffect(() => {
+    if (profile) {
+      const stored = getStoredCfpNotifications();
+      const updated = generateCfpNotificationsForProfile(profile, stored);
+      setCfpNotifications(updated);
+      saveCfpNotifications(updated);
+    }
+  }, [profile]);
+
+  const handleMarkNotificationRead = (id: string) => {
+    const updated = markCfpNotificationAsRead(id);
+    setCfpNotifications(updated);
+  };
+
+  const handleMarkAllNotificationsRead = () => {
+    const updated = markAllCfpNotificationsAsRead();
+    setCfpNotifications(updated);
+  };
 
   // Real-time Domain Mismatch UI Alert state
   const [activeDomainAlert, setActiveDomainAlert] = useState<DomainMismatchAlert | null>(null);
@@ -230,6 +259,9 @@ export default function App() {
         }}
         profile={profile}
         stats={stats}
+        notifications={cfpNotifications}
+        onMarkNotificationRead={handleMarkNotificationRead}
+        onMarkAllNotificationsRead={handleMarkAllNotificationsRead}
         onOpenProfile={() => setIsProfileModalOpen(true)}
         onOpenApiSettings={() => setIsApiSettingsOpen(true)}
         onOpenPrivacy={() => setIsPrivacyModalOpen(true)}
@@ -318,6 +350,14 @@ export default function App() {
             </div>
           )}
 
+          {currentTab === 'intelligence' && (
+            <ResearchIntelligenceView
+              profile={profile}
+              onVerifyJournal={(q) => handleVerify(q)}
+              onSaveToWatchlist={handleSaveToWatchlist}
+            />
+          )}
+
           {currentTab === 'delisted' && (
             <DelistedRepositoryView
               journals={delistedJournals}
@@ -342,6 +382,14 @@ export default function App() {
 
           {currentTab === 'finder' && (
             <JournalFinderView
+              profile={profile}
+              onVerifyJournal={(q) => handleVerify(q)}
+              onNavigateCfp={() => setCurrentTab('cfp')}
+            />
+          )}
+
+          {currentTab === 'cfp' && (
+            <CfpDiscoveryView
               profile={profile}
               onVerifyJournal={(q) => handleVerify(q)}
             />

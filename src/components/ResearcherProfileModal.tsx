@@ -3,7 +3,7 @@
  * Academic Concept & Direction: Dr. Rubaid Ashfaq
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, User, Save, RotateCcw, Check, Sparkles } from 'lucide-react';
 import { ResearcherProfile } from '../types';
 
@@ -21,9 +21,18 @@ export const ResearcherProfileModal: React.FC<ResearcherProfileModalProps> = ({
   onSaveProfile,
 }) => {
   const [draft, setDraft] = useState<ResearcherProfile>(profile);
-  const [researchAreasStr, setResearchAreasStr] = useState(draft.researchAreas.join(', '));
-  const [keywordsStr, setKeywordsStr] = useState(draft.keywords.join(', '));
+  const [researchAreasStr, setResearchAreasStr] = useState(profile?.researchAreas?.join(', ') || '');
+  const [keywordsStr, setKeywordsStr] = useState(profile?.keywords?.join(', ') || '');
   const [showSavedNotification, setShowSavedNotification] = useState(false);
+
+  // Sync draft state whenever modal opens or active profile updates
+  useEffect(() => {
+    if (isOpen && profile) {
+      setDraft(profile);
+      setResearchAreasStr(Array.isArray(profile.researchAreas) ? profile.researchAreas.join(', ') : '');
+      setKeywordsStr(Array.isArray(profile.keywords) ? profile.keywords.join(', ') : '');
+    }
+  }, [isOpen, profile]);
 
   if (!isOpen) return null;
 

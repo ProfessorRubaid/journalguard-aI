@@ -420,3 +420,273 @@ export interface PublicationBehaviourAnalysis {
   };
 }
 
+// --- Call for Papers (CfP) Discovery & Authoritative Verification ---
+
+export type CfpDeadlineStatus = 'OPEN' | 'CLOSING_SOON' | 'CLOSED' | 'DATE_NOT_VERIFIED';
+
+export interface CallForPaperItem {
+  id: string;
+  title: string;
+  journalName: string;
+  publisher: string;
+  issn?: string;
+  eIssn?: string;
+  researchTopics: string[];
+  submissionDeadline: string;
+  deadlineStatus: CfpDeadlineStatus;
+  daysRemaining?: number;
+  publicationDate?: string;
+  specialIssueTitle?: string;
+  scopusStatus: 'SCOPUS_VERIFIED' | 'NOT_VERIFIED' | 'UNAVAILABLE';
+  scopusDetails?: string;
+  wosStatus: 'WOS_VERIFIED' | 'NOT_VERIFIED' | 'UNAVAILABLE';
+  wosCollection?: 'SCIE' | 'SSCI' | 'AHCI' | 'ESCI';
+  wosDetails?: string;
+  originalCfpUrl: string; // Authenticated original publisher/journal URL
+  officialJournalUrl?: string;
+  sourceType: 'LEVEL_1_OFFICIAL_PUBLISHER' | 'LEVEL_2_SCHOLARLY_SOCIETY';
+  verificationDate: string;
+  matchScore: number; // 0 - 100
+  matchedKeywords: string[];
+  journalScopeMatch: 'High' | 'Moderate' | 'General';
+  publicationArea: string;
+  matchBreakdown: {
+    topicMatchTier: 'Excellent Match' | 'Very Strong Match' | 'Strong Match' | 'Moderate Match' | 'Low Match';
+    matchedTopics: string[];
+    keywordsCountSummary: string; // e.g. "4/5 matched"
+    journalScope: string;
+    indexingSummary: string;
+    publicationArea: string;
+    overallScore: number;
+  };
+  isVerifiedCfp: boolean;
+  guestEditors?: string;
+}
+
+export interface CfpSearchQuery {
+  title?: string;
+  abstract?: string;
+  keywords: string;
+  researchArea?: string;
+  methodology?: string;
+  discipline?: string;
+  preferredJournal?: string;
+  preferredPublisher?: string;
+  scopusPreference?: boolean;
+  wosPreference?: boolean;
+  openAccessOnly?: boolean;
+}
+
+export interface CfpNotificationItem {
+  id: string;
+  cfpId: string;
+  title: string;
+  journalName: string;
+  publisher: string;
+  deadline: string;
+  matchScore: number;
+  matchedKeywords: string[];
+  scopusStatus: string;
+  wosStatus: string;
+  originalCfpUrl: string;
+  dateCreated: string;
+  isRead: boolean;
+}
+
+export interface ApiDiagnostics {
+  scopusConnected: boolean;
+  scopusStatusText: string;
+  lastScopusVerification: string | null;
+  scopusErrorsCount: number;
+  wosConnected: boolean;
+  wosStatusText: string;
+  lastWosVerification: string | null;
+  wosErrorsCount: number;
+  cfpsDiscoveredCount: number;
+  cfpsVerifiedCount: number;
+  cfpsRejectedCount: number;
+}
+
+// ==========================================
+// RESEARCH INTELLIGENCE & VERIFIED DISCOVERY
+// ==========================================
+
+export type ResearchIntelligenceSubTab = 
+  | 'dashboard' 
+  | 'finder' 
+  | 'scopus' 
+  | 'wos' 
+  | 'abdc' 
+  | 'recommend'
+  | 'ai-recommend' 
+  | 'verify' 
+  | 'authenticity'
+  | 'compare' 
+  | 'feed' 
+  | 'alerts' 
+  | 'admin';
+
+export type AbdcRating = 'A*' | 'A' | 'B' | 'C' | 'Unranked' | 'None';
+export type WosCoreCollectionType = 'SCIE' | 'SSCI' | 'AHCI' | 'ESCI' | 'None';
+export type IntelligenceVerificationStatus = 
+  | 'VERIFIED'           // 🟢 Verified
+  | 'NEEDS_REVIEW'       // 🟡 Needs Review
+  | 'HIGH_RISK'          // 🔴 High Risk
+  | 'CLONED'             // ⚫ Potential Clone
+  | 'UNVERIFIED'         // ❌ Unverified
+  | 'verified'
+  | 'needs_review'
+  | 'high_risk'
+  | 'cloned'
+  | 'unverified';
+
+export interface JournalChangeRecord {
+  id: string;
+  field: string;
+  previousValue: string;
+  newValue: string;
+  dateChanged: string;
+  source: string;
+  verificationStatus: string;
+  notes?: string;
+}
+
+export interface IntelligenceJournal {
+  id: string;
+  title: string;
+  issn: string;
+  eIssn?: string;
+  publisher: string;
+  country: string;
+  website?: string;
+  canonicalUrl?: string;
+  subjectAreas: string[];
+  discipline: string;
+  aimsAndScope?: string;
+  
+  // Scopus data
+  scopusIndexed: boolean;
+  scopusQuartile?: 'Q1' | 'Q2' | 'Q3' | 'Q4';
+  scopusCiteScore?: number;
+  scopusSnip?: string;
+  scopusSjr?: string;
+  scopusDetails?: {
+    status: 'ACTIVE' | 'INACTIVE' | 'DISCONTINUED';
+    coverage: string;
+    citeScore?: number;
+    quartile?: 'Q1' | 'Q2' | 'Q3' | 'Q4';
+    sourceId?: string;
+    sourceType?: string;
+  };
+  
+  // Web of Science data
+  wosIndexed: boolean;
+  wosCoreCollection?: WosCoreCollectionType;
+  wosImpactFactor?: string;
+  wosJci?: string;
+  wosDetails?: {
+    collection: WosCoreCollectionType;
+    category?: string;
+    impactFactor?: string;
+  };
+
+  // ABDC data
+  abdcRanked?: boolean;
+  abdcRating?: AbdcRating;
+  abdcPanel?: string;
+  abdcForCode?: string;
+  abdcDetails?: {
+    rating: AbdcRating;
+    forCode?: string;
+    panel?: string;
+    yearEstablished?: number;
+  };
+
+  // DOAJ / Open Access
+  openAccess?: boolean;
+  openAccessType?: 'Diamond' | 'Gold' | 'Hybrid' | 'Subscription' | string;
+  doajIndexed?: boolean;
+  apcAmount?: string;
+  publicationFrequency?: string;
+  peerReviewType?: string;
+  firstDecisionWeeks?: number;
+  submissionToPublicationWeeks?: number;
+  acceptanceRatePercent?: number;
+
+  // Authenticity & Verification
+  verificationStatus: IntelligenceVerificationStatus;
+  riskScore?: number; // 0-100
+  riskTier?: 'LOW' | 'MODERATE' | 'HIGH' | 'CRITICAL';
+  riskWarningSignals?: string[];
+  isClonedRisk?: boolean;
+  clonedEvidence?: {
+    canonicalDomain: string;
+    counterfeitHost?: string;
+    reason: string;
+  };
+  lastVerified?: string;
+  lastVerifiedDate?: string;
+  nextVerification?: string;
+  nextVerificationDate?: string;
+  sourceAttribution?: string[];
+  changeHistory?: JournalChangeRecord[];
+}
+
+export interface EcosystemStats {
+  totalRegisteredResearchers: number;
+  activeResearchersThisMonth: number;
+  totalCountries: number;
+  countriesBreakdown: { country: string; code: string; count: number; region: string }[];
+  regionsBreakdown: { region: string; count: number }[];
+  institutionsBreakdown: { institution: string; country: string; count: number }[];
+  careerStagesBreakdown: { stage: string; count: number }[];
+  popularResearchAreas: { area: string; count: number }[];
+  mostSearchedKeywords: { keyword: string; searches: number; trend: string }[];
+  mostFollowedJournals: { journal: string; followers: number; publisher: string }[];
+  mostSearchedPublishers: { publisher: string; count: number }[];
+  trendingTopics: string[];
+  recentJournalUpdates: { journalTitle: string; change: string; date: string; type: 'indexing' | 'abdc' | 'verification' }[];
+}
+
+export interface IntelligenceAlert {
+  id: string;
+  type: 'info' | 'action_required' | 'critical';
+  priority?: 'info' | 'action_required' | 'critical';
+  title: string;
+  message: string;
+  timestamp: string;
+  journalName?: string;
+  journalTitle?: string;
+  issn?: string;
+  read: boolean;
+  actionLabel?: string;
+  actionTarget?: string;
+}
+
+export interface AiRecommendationInput {
+  title: string;
+  abstract: string;
+  keywords: string;
+  methodology: string;
+  discipline: string;
+  targetAudience: string;
+  preferredIndexing: 'all' | 'scopus' | 'wos' | 'abdc' | 'open_access';
+  budgetTier: 'all' | 'no_apc' | 'under_25k' | 'above_25k';
+  openAccessOnly: boolean;
+}
+
+export interface AiJournalRecommendationResult {
+  journal: IntelligenceJournal;
+  matchScore: number;
+  scoreBreakdown: {
+    scopeMatch: number;
+    keywordMatch: number;
+    subjectAreaMatch: number;
+    recentPubRelevance: number;
+    indexingPreference: number;
+  };
+  whyThisJournal: string[];
+  suitabilityVerdict: string;
+}
+
+

@@ -45,6 +45,7 @@ import {
   ReferenceLine
 } from 'recharts';
 import { ResearcherProfile, SavedJournalEntry, VerificationResult } from '../types';
+import { findJournalsSync } from '../services/recommenderEngine';
 
 export type HistorySortField = 'date' | 'score' | 'risk';
 export type HistorySortOrder = 'asc' | 'desc';
@@ -173,7 +174,20 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   const highRiskCount = savedJournals.filter(j => j.riskScore >= 60).length + 2;
   const needsVerificationCount = savedJournals.filter(j => j.authenticityScore >= 50 && j.authenticityScore < 80).length + 3;
   const totalChecked = Math.max(27, history.length + 22);
-  const recommendedCount = 8;
+  
+  // Dynamically calculate recommended journals matching the researcher's active keywords
+  const dynamicRecommendations = useMemo(() => {
+    const topic = [
+      ...(profile.researchAreas || []),
+      ...(profile.keywords || [])
+    ].join(' ');
+    const results = findJournalsSync({
+      topic: topic || 'Artificial Intelligence and Data Science',
+      keywords: profile.keywords || []
+    }, profile);
+    return results;
+  }, [profile.researchAreas, profile.keywords, profile]);
+  const recommendedCount = dynamicRecommendations.length;
 
   // Format date helper
   const formatAuditDate = (isoString: string) => {
@@ -449,18 +463,23 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           </div>
 
           {/* Recommended Journals */}
-          <div className="p-4 rounded-2xl bg-purple-50/80 border border-purple-200/90 shadow-2xs hover:border-purple-300 transition-colors">
+          <button
+            onClick={() => onNavigateTab('finder')}
+            className="p-4 rounded-2xl bg-purple-50/80 border border-purple-200/90 shadow-2xs hover:border-purple-400 hover:bg-purple-100/70 transition-all cursor-pointer text-left w-full group"
+            title="Click to view tailored journal recommendations"
+          >
             <div className="flex items-center justify-between mb-2">
               <span className="text-xs font-semibold text-purple-800">Curated</span>
-              <Compass className="w-4 h-4 text-purple-600" />
+              <Compass className="w-4 h-4 text-purple-600 group-hover:rotate-45 transition-transform" />
             </div>
             <div className="text-2xl sm:text-3xl font-extrabold text-purple-900 tabular-nums">
               {recommendedCount}
             </div>
-            <span className="text-[11px] text-purple-700 block mt-1">
-              Target Candidates
+            <span className="text-[11px] text-purple-700 block mt-1 flex items-center justify-between">
+              <span>Target Candidates</span>
+              <span className="text-[10px] font-bold text-purple-600 underline">Explore &rarr;</span>
             </span>
-          </div>
+          </button>
 
         </div>
       </div>
@@ -503,13 +522,22 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               Filter vetted Scopus, Web of Science and DOAJ journals matching your research budget and preferred quartile.
             </p>
           </div>
-          <button
-            onClick={() => onNavigateTab('finder')}
-            className="mt-6 px-4 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-semibold text-xs flex items-center justify-center gap-2 transition-colors cursor-pointer"
-          >
-            <span>Explore Matched Journals</span>
-            <ArrowUpRight className="w-4 h-4" />
-          </button>
+          <div className="mt-6 flex flex-col gap-2">
+            <button
+              onClick={() => onNavigateTab('finder')}
+              className="px-4 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-semibold text-xs flex items-center justify-center gap-2 transition-colors cursor-pointer"
+            >
+              <span>Explore Matched Journals</span>
+              <ArrowUpRight className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => onNavigateTab('cfp')}
+              className="px-4 py-2 rounded-xl bg-purple-50 hover:bg-purple-100 dark:bg-purple-950/60 dark:hover:bg-purple-900/60 text-purple-800 dark:text-purple-300 border border-purple-200 dark:border-purple-800 font-semibold text-xs flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+            >
+              <Sparkles className="w-3.5 h-3.5 text-purple-600" />
+              <span>Call for Papers Discovery</span>
+            </button>
+          </div>
         </div>
 
         {/* Workspace 3: Smart Pre-Submission Checklist */}

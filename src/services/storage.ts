@@ -7,7 +7,7 @@
  * Provides clean "DELETE MY DATA" wipe.
  */
 
-import { ResearcherProfile, SavedJournalEntry, VerificationResult, DelistedJournal, PlatformStats } from '../types';
+import { ResearcherProfile, SavedJournalEntry, VerificationResult, DelistedJournal, PlatformStats, CfpNotificationItem } from '../types';
 import { DEFAULT_RESEARCHER_PROFILE, DEMO_RESEARCHER_DEFAULT, getDemoVerificationResult } from './demoData';
 import { INITIAL_DELISTED_JOURNALS } from './delistedData';
 
@@ -16,6 +16,7 @@ const SAVED_JOURNALS_KEY = 'jg_saved_journals_v1';
 const HISTORY_KEY = 'jg_verification_history_v1';
 const STATS_KEY = 'shodhsetu_platform_stats_v1';
 const DELISTED_KEY = 'shodhsetu_delisted_journals_v1';
+const CFP_NOTIFICATIONS_KEY = 'shodhsetu_cfp_notifications_v1';
 
 // Initial preloaded realistic library items matching prompt initial dashboard stats:
 // 27 checked, 18 verified, 4 high risk, 5 needs verification, 12 saved
@@ -163,12 +164,12 @@ export function getStoredProfile(): ResearcherProfile {
     const data = localStorage.getItem(PROFILE_KEY);
     if (data) {
       const parsed = JSON.parse(data);
-      // If user had previous personal Dr. Rubaid Ashfaq profile cached, reset to clean default
-      if (parsed.fullName === 'Dr. Rubaid Ashfaq' || parsed.email === 'Rubaidashfaq@gmail.com') {
-        saveStoredProfile(DEFAULT_RESEARCHER_PROFILE);
-        return DEFAULT_RESEARCHER_PROFILE;
-      }
-      return parsed;
+      return {
+        ...DEFAULT_RESEARCHER_PROFILE,
+        ...parsed,
+        researchAreas: Array.isArray(parsed.researchAreas) ? parsed.researchAreas : [],
+        keywords: Array.isArray(parsed.keywords) ? parsed.keywords : [],
+      };
     }
   } catch (e) {
     console.error('Failed reading profile from storage:', e);
@@ -420,6 +421,41 @@ export function addDelistedJournalsBatch(entries: DelistedJournal[]): DelistedJo
     }));
   } catch {}
 
+  return updated;
+}
+
+// --- Researcher Profile Call for Papers Notifications Storage ---
+
+export function getStoredCfpNotifications(): CfpNotificationItem[] {
+  try {
+    const raw = localStorage.getItem(CFP_NOTIFICATIONS_KEY);
+    if (!raw) return [];
+    return JSON.parse(raw);
+  } catch (e) {
+    console.error('Failed to parse CFP notifications from storage:', e);
+    return [];
+  }
+}
+
+export function saveCfpNotifications(notifications: CfpNotificationItem[]): void {
+  try {
+    localStorage.setItem(CFP_NOTIFICATIONS_KEY, JSON.stringify(notifications));
+  } catch (e) {
+    console.error('Failed to save CFP notifications to storage:', e);
+  }
+}
+
+export function markCfpNotificationAsRead(id: string): CfpNotificationItem[] {
+  const current = getStoredCfpNotifications();
+  const updated = current.map(item => item.id === id ? { ...item, isRead: true } : item);
+  saveCfpNotifications(updated);
+  return updated;
+}
+
+export function markAllCfpNotificationsAsRead(): CfpNotificationItem[] {
+  const current = getStoredCfpNotifications();
+  const updated = current.map(item => ({ ...item, isRead: true }));
+  saveCfpNotifications(updated);
   return updated;
 }
 
