@@ -26,7 +26,12 @@ import {
   DollarSign
 } from 'lucide-react';
 import { IntelligenceJournal, ResearcherProfile } from '../../types';
-import { searchIntelligenceJournals, JournalSearchFilterOptions } from '../../services/researchIntelligenceService';
+import { 
+  searchIntelligenceJournals, 
+  getStoredIntelligenceJournals, 
+  JournalSearchFilterOptions 
+} from '../../services/researchIntelligenceService';
+
 
 interface MultiDatabaseJournalFinderProps {
   profile: ResearcherProfile;
@@ -68,6 +73,22 @@ export const MultiDatabaseJournalFinder: React.FC<MultiDatabaseJournalFinderProp
     return list;
   }, [filterOptions, diamondOnly]);
 
+  const allCatalog = useMemo(() => getStoredIntelligenceJournals(), []);
+  const allJournalsCount = allCatalog.length;
+  const scopusCount = useMemo(() => allCatalog.filter(j => j.scopusIndexed).length, [allCatalog]);
+  const wosCount = useMemo(() => allCatalog.filter(j => j.wosIndexed).length, [allCatalog]);
+  const abdcCount = useMemo(() => allCatalog.filter(j => j.abdcRanked || (j.abdcRating && j.abdcRating !== 'None' && j.abdcRating !== 'Unranked')).length, [allCatalog]);
+  const oaCount = useMemo(() => allCatalog.filter(j => j.openAccess || j.doajIndexed || j.openAccessType === 'Diamond' || j.openAccessType === 'Gold').length, [allCatalog]);
+
+  const handleResetFilters = () => {
+    setSearchQuery('');
+    setSelectedDiscipline('all');
+    setSelectedIndexing('all');
+    setSelectedQuartile('all');
+    setSelectedAbdc('all');
+    setDiamondOnly(false);
+  };
+
   const isAlreadyInCompare = (id: string) => compareList.some(item => item.id === id);
 
   return (
@@ -91,6 +112,69 @@ export const MultiDatabaseJournalFinder: React.FC<MultiDatabaseJournalFinderProp
       {/* Unified Search & Multi-Filter Bar */}
       <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xs space-y-4">
         
+        {/* Quick Database Selector Bar with live counts */}
+        <div>
+          <div className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">
+            Select Authoritative Scholarly Database
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              onClick={() => setSelectedIndexing('all')}
+              className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors cursor-pointer ${
+                selectedIndexing === 'all'
+                  ? 'bg-blue-600 text-white shadow-2xs'
+                  : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200'
+              }`}
+            >
+              All Databases ({allJournalsCount})
+            </button>
+            <button
+              onClick={() => setSelectedIndexing('scopus')}
+              className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors cursor-pointer flex items-center gap-1.5 ${
+                selectedIndexing === 'scopus'
+                  ? 'bg-orange-600 text-white shadow-2xs'
+                  : 'bg-orange-50 dark:bg-orange-950/50 text-orange-700 dark:text-orange-300 border border-orange-200 dark:border-orange-800 hover:bg-orange-100'
+              }`}
+            >
+              <span>Elsevier Scopus</span>
+              <span className="text-[10px] opacity-80 tabular-nums font-bold">({scopusCount})</span>
+            </button>
+            <button
+              onClick={() => setSelectedIndexing('wos')}
+              className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors cursor-pointer flex items-center gap-1.5 ${
+                selectedIndexing === 'wos'
+                  ? 'bg-emerald-600 text-white shadow-2xs'
+                  : 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 hover:bg-emerald-100'
+              }`}
+            >
+              <span>Web of Science Core</span>
+              <span className="text-[10px] opacity-80 tabular-nums font-bold">({wosCount})</span>
+            </button>
+            <button
+              onClick={() => setSelectedIndexing('abdc')}
+              className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors cursor-pointer flex items-center gap-1.5 ${
+                selectedIndexing === 'abdc'
+                  ? 'bg-amber-600 text-white shadow-2xs'
+                  : 'bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800 hover:bg-amber-100'
+              }`}
+            >
+              <span>ABDC 2026 List</span>
+              <span className="text-[10px] opacity-80 tabular-nums font-bold">({abdcCount})</span>
+            </button>
+            <button
+              onClick={() => setSelectedIndexing('open_access')}
+              className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors cursor-pointer flex items-center gap-1.5 ${
+                selectedIndexing === 'open_access'
+                  ? 'bg-cyan-600 text-white shadow-2xs'
+                  : 'bg-cyan-50 dark:bg-cyan-950/50 text-cyan-700 dark:text-cyan-300 border border-cyan-200 dark:border-cyan-800 hover:bg-cyan-100'
+              }`}
+            >
+              <span>DOAJ Open Access</span>
+              <span className="text-[10px] opacity-80 tabular-nums font-bold">({oaCount})</span>
+            </button>
+          </div>
+        </div>
+
         {/* Search Input */}
         <div className="relative">
           <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5" />
@@ -122,11 +206,11 @@ export const MultiDatabaseJournalFinder: React.FC<MultiDatabaseJournalFinderProp
               onChange={(e) => setSelectedIndexing(e.target.value as any)}
               className="w-full text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 py-1.5 px-2 focus:ring-1 focus:ring-blue-500"
             >
-              <option value="all">All Authoritative Databases</option>
-              <option value="scopus">Scopus Indexed Only</option>
-              <option value="wos">Web of Science Core Only</option>
-              <option value="abdc">ABDC Listed Only</option>
-              <option value="open_access">DOAJ / Open Access</option>
+              <option value="all">All Authoritative Databases ({allJournalsCount})</option>
+              <option value="scopus">Scopus Indexed ({scopusCount})</option>
+              <option value="wos">Web of Science Core ({wosCount})</option>
+              <option value="abdc">ABDC Listed ({abdcCount})</option>
+              <option value="open_access">DOAJ / Open Access ({oaCount})</option>
             </select>
           </div>
 
@@ -229,7 +313,25 @@ export const MultiDatabaseJournalFinder: React.FC<MultiDatabaseJournalFinderProp
       </div>
 
       {/* Results View */}
-      {viewMode === 'cards' ? (
+      {results.length === 0 ? (
+        <div className="p-12 text-center rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xs space-y-3">
+          <div className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center mx-auto text-slate-500">
+            <Search className="w-5 h-5" />
+          </div>
+          <h3 className="text-sm font-bold text-slate-900 dark:text-white">
+            No Journals Matched Current Filter Combination
+          </h3>
+          <p className="text-xs text-slate-500 dark:text-slate-400 max-w-md mx-auto">
+            Try selecting "All Databases" or clearing specific discipline/quartile constraints to see the entire catalog of {allJournalsCount} verified journals.
+          </p>
+          <button
+            onClick={handleResetFilters}
+            className="px-4 py-2 text-xs font-semibold rounded-xl bg-blue-600 hover:bg-blue-700 text-white shadow-2xs transition-colors cursor-pointer"
+          >
+            Reset All Filters
+          </button>
+        </div>
+      ) : viewMode === 'cards' ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {results.map((j) => (
             <div 

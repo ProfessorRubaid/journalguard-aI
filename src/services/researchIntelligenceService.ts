@@ -29,7 +29,7 @@ import {
   ResearcherCommunityRecord 
 } from './researchIntelligenceData';
 
-const INTELLIGENCE_JOURNALS_KEY = 'shodhsetu_intel_journals_v1';
+const INTELLIGENCE_JOURNALS_KEY = 'shodhsetu_intel_journals_v3';
 const INTELLIGENCE_ALERTS_KEY = 'shodhsetu_intel_alerts_v1';
 const ADMIN_AUDIT_LOG_KEY = 'shodhsetu_admin_audit_log_v1';
 
@@ -104,12 +104,14 @@ export function getStoredIntelligenceJournals(): IntelligenceJournal[] {
     const raw = localStorage.getItem(INTELLIGENCE_JOURNALS_KEY);
     if (raw) {
       const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed) && parsed.length > 0) {
+      if (Array.isArray(parsed) && parsed.length >= INTELLIGENCE_JOURNALS_CATALOG.length) {
         return parsed.map(normalizeJournal);
       }
     }
   } catch {}
-  return INTELLIGENCE_JOURNALS_CATALOG.map(normalizeJournal);
+  const list = INTELLIGENCE_JOURNALS_CATALOG.map(normalizeJournal);
+  saveStoredIntelligenceJournals(list);
+  return list;
 }
 
 export function saveStoredIntelligenceJournals(journals: IntelligenceJournal[]): void {
@@ -337,9 +339,12 @@ export function searchIntelligenceJournals(
       if (!hasTokenMatch) return false;
     }
 
-    // Discipline filter
+    // Discipline filter (match discipline or subject areas)
     if (options.discipline && options.discipline !== 'all') {
-      if (!j.discipline.toLowerCase().includes(options.discipline.toLowerCase())) {
+      const dTarget = options.discipline.toLowerCase();
+      const disc = (j.discipline || '').toLowerCase();
+      const subjects = (j.subjectAreas || []).join(' ').toLowerCase();
+      if (!disc.includes(dTarget) && !subjects.includes(dTarget)) {
         return false;
       }
     }
@@ -347,35 +352,50 @@ export function searchIntelligenceJournals(
     // Indexing database filter
     if (options.indexing === 'scopus' && !j.scopusIndexed) return false;
     if (options.indexing === 'wos' && !j.wosIndexed) return false;
-    if (options.indexing === 'abdc' && !j.abdcRanked) return false;
-    if (options.indexing === 'open_access' && !j.openAccess) return false;
+    if (options.indexing === 'abdc') {
+      const isAbdc = j.abdcRanked || (j.abdcRating && j.abdcRating !== 'None' && j.abdcRating !== 'Unranked');
+      if (!isAbdc) return false;
+    }
+    if (options.indexing === 'open_access') {
+      const isOa = j.openAccess || j.doajIndexed || j.openAccessType === 'Diamond' || j.openAccessType === 'Gold';
+      if (!isOa) return false;
+    }
 
     // Quartile filter
     if (options.quartile && options.quartile !== 'all') {
-      if (j.scopusDetails?.quartile !== options.quartile) return false;
+      const q = j.scopusQuartile || j.scopusDetails?.quartile;
+      if (q !== options.quartile) return false;
     }
 
     // ABDC Rating filter
     if (options.abdcRating && options.abdcRating !== 'all') {
-      if (j.abdcRating !== options.abdcRating) return false;
+      const r = j.abdcRating || j.abdcDetails?.rating;
+      if (r !== options.abdcRating) return false;
     }
 
     // WoS Collection filter
     if (options.wosCollection && options.wosCollection !== 'all') {
-      if (j.wosDetails?.collection !== options.wosCollection) return false;
+      const coll = j.wosCoreCollection || j.wosDetails?.collection;
+      if (coll !== options.wosCollection) return false;
     }
 
     // Open Access Only
-    if (options.openAccessOnly && !j.openAccess) return false;
+    if (options.openAccessOnly) {
+      const isOa = j.openAccess || j.doajIndexed || j.openAccessType === 'Diamond' || j.openAccessType === 'Gold';
+      if (!isOa) return false;
+    }
 
     // Budget Tier
     if (options.budgetTier === 'no_apc') {
-      if (!j.openAccess || !j.apcAmount?.toLowerCase().includes('no apc')) return false;
+      const isZero = (j.openAccessType === 'Diamond') || (j.apcAmount?.toLowerCase().includes('no apc')) || (j.apcAmount?.toLowerCase().includes('zero'));
+      if (!isZero) return false;
     }
 
     // Verification Status
     if (options.verificationStatus && options.verificationStatus !== 'all') {
-      if (j.verificationStatus !== options.verificationStatus) return false;
+      const vStatus = String(j.verificationStatus).toUpperCase();
+      const optStatus = String(options.verificationStatus).toUpperCase();
+      if (vStatus !== optStatus) return false;
     }
 
     return true;
