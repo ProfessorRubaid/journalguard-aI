@@ -119,7 +119,7 @@ export const ResearchIntelligenceView: React.FC<ResearchIntelligenceViewProps> =
               </h1>
             </div>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-              "Verify Before You Submit. Publish With Confidence." · Concept &amp; Academic Direction: <span className="font-semibold text-slate-800 dark:text-slate-200">Dr. Rubaid Ashfaq</span>
+              "Verify Before You Submit. Publish With Confidence." · Concept &amp; Academic Direction: <span className="font-semibold text-slate-800 dark:text-slate-200">Dr. Rubaid Ashfaq</span> &amp; Co-creator <span className="font-semibold text-slate-800 dark:text-slate-200">Zeba Nabi</span>
             </p>
           </div>
 

@@ -93,7 +93,7 @@ export const ResearchEcosystemDashboard: React.FC<ResearchEcosystemDashboardProp
             </span>
           </div>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-            "Verify Before You Submit. Publish With Confidence." · Academic Direction: <span className="font-semibold text-slate-700 dark:text-slate-300">Dr. Rubaid Ashfaq</span>
+            "Verify Before You Submit. Publish With Confidence." · Academic Direction: <span className="font-semibold text-slate-700 dark:text-slate-300">Dr. Rubaid Ashfaq</span> &amp; Co-creator <span className="font-semibold text-slate-700 dark:text-slate-300">Zeba Nabi</span>
           </p>
         </div>
 

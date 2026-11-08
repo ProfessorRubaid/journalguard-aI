@@ -108,7 +108,7 @@ URGENT ACADEMIC INTEGRITY ALERT: An unauthorized, counterfeit cloned journal web
 3. Alert Clarivate (WoS), Scopus, DOAJ, Crossref, and COPE
 
 * Forensic Audit Reference: ${params.auditId}
-* Generated via ShodhSetu (Academic Concept & Direction: Dr. Rubaid Ashfaq)
+* Generated via ShodhSetu (Academic Concept & Direction: Dr. Rubaid Ashfaq & Co-creator Zeba Nabi)
 [Notice: Full technical evidence report has also been copied to clipboard for your legal team.]`;
 }
 
@@ -224,7 +224,7 @@ Audit Reference ID : ${result.id}
 Audited By         : ${profile?.fullName || 'Scholarly Integrity Researcher'}
 Affiliated Org     : ${profile?.institution || 'Academic Institution'} (${profile?.country || 'Global Research Community'})
 Verification Engine: SHODHSETU (Research Integrity & Journal Authenticity Intelligence)
-Academic Concept   : Dr. Rubaid Ashfaq
+Academic Concept   : Dr. Rubaid Ashfaq & Co-creator Zeba Nabi
 Verification Date  : ${new Date(result.timestamp).toUTCString()}
 ========================================================================
 `;

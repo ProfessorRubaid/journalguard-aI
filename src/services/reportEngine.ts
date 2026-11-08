@@ -8,7 +8,7 @@ import { VerificationResult, ResearcherProfile } from '../types';
 export function exportResultToCSV(result: VerificationResult, profile: ResearcherProfile): void {
   const rows = [
     ['SHODHSETU - JOURNAL VERIFICATION REPORT'],
-    ['Created by', 'Dr. Rubaid Ashfaq'],
+    ['Created by', 'Dr. Rubaid Ashfaq & Zeba Nabi (Co-creator)'],
     ['Report Date', result.timestamp],
     [''],
     ['RESEARCHER PROFILE'],
@@ -67,7 +67,7 @@ export function exportResultToJSON(result: VerificationResult, profile: Research
   const exportPayload = {
     metadata: {
       generator: 'ShodhSetu',
-      createdBy: 'Dr. Rubaid Ashfaq',
+      createdBy: 'Dr. Rubaid Ashfaq & Zeba Nabi (Co-creator)',
       exportedAt: new Date().toISOString(),
       disclaimer: 'ShodhSetu is an academic screening tool. Indicators do not represent official determinations by indexing bodies.',
     },

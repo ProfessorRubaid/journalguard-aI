@@ -9,7 +9,7 @@
  * - Server-side proxy API verification integration
  */
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { 
   Search, 
   Filter, 
@@ -20,10 +20,13 @@ import {
   BarChart3, 
   ShieldCheck, 
   RefreshCw,
-  Building
+  Building,
+  UploadCloud,
+  FileSpreadsheet
 } from 'lucide-react';
 import { IntelligenceJournal } from '../../types';
 import { getStoredIntelligenceJournals } from '../../services/researchIntelligenceService';
+import { ScopusExcelUploadModal } from './ScopusExcelUploadModal';
 
 interface ScopusJournalViewProps {
   onOpenDossier: (journal: IntelligenceJournal) => void;
@@ -39,8 +42,21 @@ export const ScopusJournalView: React.FC<ScopusJournalViewProps> = ({
   const [selectedSubject, setSelectedSubject] = useState<string>('all');
   const [isApiChecking, setIsApiChecking] = useState<boolean>(false);
   const [apiCheckResult, setApiCheckResult] = useState<string | null>(null);
+  const [isUploadModalOpen, setIsUploadModalOpen] = useState<boolean>(false);
+  const [catalogVersion, setCatalogVersion] = useState<number>(0);
 
-  const allJournals = useMemo(() => getStoredIntelligenceJournals(), []);
+  // Listen for batch upload events to auto-refresh catalog
+  useEffect(() => {
+    const handleCatalogUpdate = () => {
+      setCatalogVersion(v => v + 1);
+    };
+    window.addEventListener('shodhsetu_intel_journals_updated', handleCatalogUpdate);
+    return () => {
+      window.removeEventListener('shodhsetu_intel_journals_updated', handleCatalogUpdate);
+    };
+  }, []);
+
+  const allJournals = useMemo(() => getStoredIntelligenceJournals(), [catalogVersion]);
 
   // Compute live quartile counts across the catalog
   const counts = useMemo(() => {
@@ -108,17 +124,29 @@ export const ScopusJournalView: React.FC<ScopusJournalViewProps> = ({
     <div className="space-y-6">
       {/* Scopus Brand Header */}
       <div className="p-6 rounded-2xl bg-gradient-to-r from-orange-600 via-amber-700 to-slate-900 text-white relative overflow-hidden shadow-sm">
-        <div className="relative z-10 max-w-3xl">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/20 text-white text-xs font-semibold mb-2 backdrop-blur-xs">
-            <Award className="w-3.5 h-3.5" />
-            <span>Elsevier Scopus Authoritative Index</span>
+        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="max-w-3xl">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/20 text-white text-xs font-semibold mb-2 backdrop-blur-xs">
+              <Award className="w-3.5 h-3.5" />
+              <span>Elsevier Scopus Authoritative Index</span>
+            </div>
+            <h2 className="text-2xl font-bold tracking-tight">
+              Scopus Indexed Journals Directory
+            </h2>
+            <p className="text-xs sm:text-sm text-orange-100/90 mt-1 leading-relaxed">
+              Verify official Scopus coverage, CiteScore calculations, SJR, SNIP, and quartile percentiles directly from authenticated scholarly records.
+            </p>
           </div>
-          <h2 className="text-2xl font-bold tracking-tight">
-            Scopus Indexed Journals Directory
-          </h2>
-          <p className="text-xs sm:text-sm text-orange-100/90 mt-1 leading-relaxed">
-            Verify official Scopus coverage, CiteScore 2024/2026 calculations, SJR, SNIP, and subject area quartile percentiles directly from authenticated scholarly records.
-          </p>
+
+          <div className="shrink-0 flex items-center gap-2">
+            <button
+              onClick={() => setIsUploadModalOpen(true)}
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white hover:bg-orange-50 text-orange-800 font-extrabold text-xs shadow-md transition-all cursor-pointer"
+            >
+              <UploadCloud className="w-4 h-4 text-orange-600" />
+              <span>Upload Scopus Excel Sheet</span>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -218,16 +246,27 @@ export const ScopusJournalView: React.FC<ScopusJournalViewProps> = ({
       </div>
 
       {/* Scopus Journals Count & List */}
-      <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
-        <span>Showing <strong className="text-slate-800 dark:text-slate-200">{scopusJournals.length}</strong> authenticated Scopus journals</span>
-        {(searchQuery || selectedQuartile !== 'all' || selectedSubject !== 'all') && (
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-slate-500 dark:text-slate-400">
+        <div>
+          Showing <strong className="text-slate-800 dark:text-slate-200">{scopusJournals.length}</strong> authenticated Scopus journals
+        </div>
+        <div className="flex items-center gap-3">
           <button
-            onClick={handleResetFilters}
-            className="text-orange-600 dark:text-orange-400 hover:underline font-medium cursor-pointer"
+            onClick={() => setIsUploadModalOpen(true)}
+            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-orange-50 dark:bg-orange-950/60 text-orange-700 dark:text-orange-300 border border-orange-200 dark:border-orange-800 font-semibold hover:bg-orange-100 transition-colors cursor-pointer"
           >
-            Clear Active Filters
+            <UploadCloud className="w-3.5 h-3.5 text-orange-600" />
+            <span>Upload Excel (.xlsx)</span>
           </button>
-        )}
+          {(searchQuery || selectedQuartile !== 'all' || selectedSubject !== 'all') && (
+            <button
+              onClick={handleResetFilters}
+              className="text-orange-600 dark:text-orange-400 hover:underline font-medium cursor-pointer"
+            >
+              Clear Active Filters
+            </button>
+          )}
+        </div>
       </div>
 
       {scopusJournals.length === 0 ? (
@@ -239,15 +278,24 @@ export const ScopusJournalView: React.FC<ScopusJournalViewProps> = ({
             No Scopus Journals Match Your Current Filters
           </h3>
           <p className="text-xs text-slate-500 dark:text-slate-400 max-w-md mx-auto">
-            We verified all authentic Scopus titles in the registry, but none matched your active search query and quartile/subject criteria.
+            We verified all authentic Scopus titles in the registry, but none matched your active search query and quartile/subject criteria. You can also upload your own Scopus journal Excel sheet.
           </p>
-          <button
-            onClick={handleResetFilters}
-            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-orange-600 hover:bg-orange-700 text-white text-xs font-semibold shadow-xs cursor-pointer transition-colors"
-          >
-            <RefreshCw className="w-3.5 h-3.5" />
-            <span>Reset Scopus Filters</span>
-          </button>
+          <div className="flex items-center justify-center gap-2 pt-2">
+            <button
+              onClick={handleResetFilters}
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-700 dark:text-slate-200 text-xs font-semibold cursor-pointer transition-colors"
+            >
+              <RefreshCw className="w-3.5 h-3.5" />
+              <span>Reset Scopus Filters</span>
+            </button>
+            <button
+              onClick={() => setIsUploadModalOpen(true)}
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-orange-600 hover:bg-orange-700 text-white text-xs font-semibold shadow-xs cursor-pointer transition-colors"
+            >
+              <UploadCloud className="w-3.5 h-3.5" />
+              <span>Upload Scopus Excel Sheet</span>
+            </button>
+          </div>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -334,7 +382,15 @@ export const ScopusJournalView: React.FC<ScopusJournalViewProps> = ({
           ))}
         </div>
       )}
+
+      {/* Scopus Excel Batch Upload Modal */}
+      <ScopusExcelUploadModal
+        isOpen={isUploadModalOpen}
+        onClose={() => setIsUploadModalOpen(false)}
+        existingJournals={allJournals}
+      />
     </div>
   );
 };
+
 
